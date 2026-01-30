@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Payment Success</title>
+</head>
+<body>
+    <h2>✅ Transaction Successful</h2>
+
+    <p><strong>Amount:</strong> ₹{{ data.amount }}</p>
+    <p><strong>Sent to:</strong> {{ data.receiver_name }}</p>
+    <p><strong>From:</strong> {{ data.sender_name }}</p>
+    <p><strong>Date:</strong> {{ data.date }}</p>
+    <p><strong>Method:</strong> {{ data.method }}</p>
+
+    <a href="{% url 'transfer' %}">Make Another Transfer</a>
+</body>
+</html>

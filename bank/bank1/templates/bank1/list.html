@@ -1,0 +1,17 @@
+<table border="1" cellpadding="10">
+  <tr>
+    <th>Username</th>
+    <th>Account Number</th>
+    <th>UPI ID</th>
+    <th>Balance</th>
+  </tr>
+  {% for user in users %}
+  <tr>
+    <td>{{ user.username }}</td>
+    <td>{{ user.userprofile.account_number }}</td>
+    <td>{{ user.userprofile.upi_id }}</td>
+    <td>₹{{ user.userprofile.balance }}</td>
+  </tr>
+  {% endfor %}
+</table>
+

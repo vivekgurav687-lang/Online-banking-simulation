@@ -1,0 +1,931 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Mobile/DTH recharge</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body,
+        html {
+            width: 100%;
+            height: 100vh;
+            margin: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1f1c2c, #928dab);
+            display: flex;
+            /* flex-direction: column; */
+            justify-content: center;
+            align-items: center;
+
+        }
+
+        .second {
+            height: 100%;
+            width: 75%;
+            display: flex;
+            flex-direction: row;
+            justify-content: center;
+            align-items: center;
+            height: 645px;
+        }
+
+        .container {
+            padding: 2rem 2.5rem;
+            width: 55%;
+            height: 100%;
+            margin-top: 20%;
+
+        }
+
+        .vertical-menu {
+            width: 220px;
+            height: 100%;
+            background: black;
+            color: white;
+            padding-top: 10px;
+            overflow-y: auto;
+        }
+
+        .recharge-card {
+            display: flex;
+            align-items: center;
+            padding: 8px;
+            margin-bottom: 5px;
+            cursor: pointer;
+            border-radius: 6px;
+        }
+
+        .recharge-card:hover {
+            background: rgba(255, 255, 255, 0.286);
+        }
+
+        .recharge-card .logo img {
+            width: 32px;
+            height: 32px;
+            margin-right: 10px;
+        }
+
+        .toggle-container {
+            display: inline-flex;
+            background: #ddd;
+            border-radius: 30px;
+            position: relative;
+            width: 200px;
+            cursor: pointer;
+            user-select: none;
+            margin-left: 20%;
+            padding: 0;
+            overflow: hidden;
+        }
+
+        .toggle-container a {
+            flex: 1;
+            text-align: center;
+            padding: 10px 0;
+            /* reduce vertical padding to remove gap */
+            text-decoration: none;
+            color: #555;
+            font-weight: 600;
+            z-index: 1;
+            position: relative;
+            transition: color .3s;
+            border-radius: 0;
+            /* remove radius from links */
+        }
+
+        .toggle-container a.active {
+            color: white;
+        }
+
+        .slider {
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            width: 50%;
+            background: #334155;
+            border-radius: 30px;
+            transition: left .3s;
+            left: 0;
+            z-index: 0;
+        }
+
+        .toggle-container.dth-active .slider {
+            left: 50%;
+        }
+
+        .select-wrapper label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 4%;
+            font-size: 1rem;
+            color: white;
+            margin-top: 10%;
+        }
+
+        /* Hide default dropdown arrow */
+        .select-wrapper select {
+            width: 100%;
+            padding: 0.6rem 1rem;
+            font-size: 1rem;
+            border: 1.8px solid #cbd5e1;
+            border-radius: 8px;
+            background-color: #ffffff9a;
+            color: #333;
+            cursor: pointer;
+            -webkit-appearance: none;
+            /* Safari */
+            -moz-appearance: none;
+            /* Firefox */
+            appearance: none;
+            transition: border-color 0.3s ease;
+        }
+
+        option {
+             background-color: #334155; /* Dark bluish background */
+             color: white; 
+        }
+
+        /* Optional focus style */
+        .select-wrapper select:hover,
+        .select-wrapper select:focus {
+            border-color: #007bff;
+            outline: none;
+        }
+
+        /* Style the "Change" text */
+        .select-wrapper .change-text {
+            position: absolute;
+            right: 20px;
+            top: 38px;
+            /* adjust depending on label and select height */
+            font-size: 0.9rem;
+            color: #007bff;
+            cursor: pointer;
+            user-select: none;
+            font-weight: 600;
+            text-decoration: underline;
+        }
+
+        /* Error message styling */
+        .select-wrapper small#operator-lock-msg {
+            display: block;
+            margin-top: 5px;
+            color: #e53e3e;
+            /* red for error */
+            font-size: 0.85rem;
+            min-height: 1.2em;
+        }
+
+        .select-c {
+            width: 50%;
+            margin-left: 5%;
+            height: 100%;
+            padding: 20px 50px;
+            background: rgba(255, 255, 255, 0.307);
+            backdrop-filter: blur(8px);
+            border-radius: 20px;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+        }
+
+        .plan-category {
+            display: flex;
+            justify-content: flex-start;
+            list-style: none;
+            gap: 30px;
+            border-bottom: 1px solid black;
+            overflow-x: auto;
+            white-space: nowrap;
+            scrollbar-width: bold; /* Firefox */
+            -webkit-overflow-scrolling: touch; /* Smooth swipe */
+        }
+
+        .plan-category li {
+            cursor: pointer;
+            white-space: nowrap;
+            padding-bottom: 10px;
+            flex-shrink: 0; /* prevents shrinking */
+        }
+
+        
+        .plan-category::-webkit-scrollbar {
+            height: 6px;
+        }
+
+        .plan-category::-webkit-scrollbar-thumb:hover{
+            background: #ccc;
+        }
+        .plan-category::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.4);
+            border-radius: 3px;
+        }
+        .plan-category::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+       .plan-category li:hover{
+        color: white;
+       } 
+
+        .plan-category li.active{
+            color: white;
+            border-bottom: solid white;
+        }
+    
+
+        .plan-list {
+            margin-top: 10px;
+            display: flex;
+            flex-wrap: wrap; /* allow multiple rows */
+            flex-direction: row; /* row layout so wrapping works */
+            justify-content: flex-start;
+            align-items: flex-start;
+            max-height: 300px; /* scroll area height */
+            overflow-y: auto;  /* vertical scroll */
+            gap: 10px; /* spacing between cards */
+        }
+
+        .plan-list > .plan-card {
+            flex: 0 0 calc(33.33% - 10px); /* 3 cards per row */
+            box-sizing: border-box;
+        }
+        .plan-card {
+            border: 1px solid #ccc;
+            padding: 1rem;
+            border-radius: 6px;
+            width: 180px;
+            cursor: pointer;
+            text-align: center;
+        }
+
+        .plan-card:hover {
+            background-color: #f0f8ff;
+            border-color: #4287f5;
+        }
+
+        .plan-card.selected {
+            background-color: #4287f5;
+            color: white;
+            border-color: #1a5ddf;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 4%;
+            font-weight: 600;
+            color: white;
+            margin-top: 3%;
+        }
+
+        input[type="text"] {
+            width: 100%;
+            padding: .6rem 1rem;
+            border-radius: 8px;
+            border: 1.8px solid #cbd5e1;
+            font-size: 1rem;
+            margin-bottom: 1rem;
+            background-color: rgba(255, 255, 255, 0.594);
+        }
+
+        input:focus {
+            outline: none;
+        }
+
+        #openPinOverlayBtn {
+            width: 50%;
+            margin-left: 25%;
+            margin-top: 5%;
+            padding: 1rem 1rem;
+            background-color: #5a4c95;
+            border: none;
+            border-radius: 8px;
+            color: white;
+            font-weight: 600;
+            font-size: 1.1rem;
+            cursor: pointer;
+        }
+
+        #openPinOverlayBtn:disabled {
+            background-color: #928dab;
+            cursor: not-allowed;
+        }
+
+        #pinOverlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, .6);
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        #pinOverlay .pin-box {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 8px;
+            text-align: center;
+            width: 280px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, .2);
+        }
+
+        #pinOverlay .pin-inputs input {
+            width: 40px;
+            height: 40px;
+            font-size: 24px;
+            text-align: center;
+            margin: 0 5px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+
+        .back {
+            height: 60px;
+            width: 100%;
+        }
+
+        .back button {
+            height: 50px;
+            margin: 5px;
+            width: 100px;
+            font-size: 20px;
+            font-weight: bold;
+            border-radius: 50px;
+        }
+
+        .user-icon {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            border-radius: 50%;
+            padding: 10px;
+            cursor: pointer;
+            z-index: 1001;
+        }
+
+        /* Vertical menu */
+        .vertical-menu {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 320px;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.586);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            color: black;
+            transform: translateX(-100%);
+            transition: transform 0.3s ease;
+            z-index: 1000;
+            padding-top: 60px;
+        }
+
+        .vertical-menu.show {
+            transform: translateX(0);
+        }
+
+        .my-recharges {
+            padding: 10px;
+        }
+
+        .recharge-card {
+            display: flex;
+            align-items: center;
+            padding: 10px;
+            border-bottom: 1px solid #333;
+            cursor: pointer;
+        }
+
+        .recharge-card .logo img {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+        }
+
+        .recharge-card .details {
+            margin-left: 10px;
+        }
+
+        /* On smaller screens, stack vertically */
+        @media (max-width: 768px) {
+            .second {
+                flex-direction: column;
+                padding-top: 50%;
+                height: auto;
+                width: 100%;
+
+            }
+
+            .my-recharges {
+                width: 100%;
+                max-width: 100%;
+                margin: 0;
+            }
+
+            .plan-list {
+                display: flex;
+                flex-direction: column;
+                width: 100%;
+            }
+
+            .container {
+                margin-top: 10px;
+                width: 100%;
+                max-width: 100%;
+                padding: 0;
+            }
+
+
+            label {
+                margin-left: 2%;
+            }
+
+            input[type="text"] {
+                width: 98%;
+                margin-left: 1%;
+            }
+
+            /* Toggle container centering */
+            .toggle-container {
+                margin-left: 15%;
+                width: 80%;
+                justify-content: center;
+                height: 40px;
+            }
+
+            .toggle-container a {
+                padding: 12px;
+                font-size: 0.9rem;
+            }
+
+            .select-wrapper select {
+                width: 98%;
+                margin-left: 1%;
+            }
+
+            .select-c {
+                width: 100%;
+                margin-top: 20px;
+                margin-left: 0;
+                border-radius: 0;
+                padding: 1rem 1rem;
+            }
+
+            .plan-category {
+                gap: 20px;
+                display: flex;
+                justify-content: flex-start;
+                /* flex-wrap: wrap; */
+                /* justify-content: center; */
+                overflow-x: auto;
+                white-space: nowrap;
+                scrollbar-width: thin;
+                /* Firefox */
+                -webkit-overflow-scrolling: touch;
+                /* Smooth touch scroll */
+            }
+
+            .plan-category li {
+                font-size: 0.9rem;
+                flex-shrink: 0;
+                /* prevents shrinking */
+            }
+
+            .plan-category::-webkit-scrollbar {
+                height: 6px;
+                /* horizontal scrollbar height */
+            }
+
+            .plan-category::-webkit-scrollbar-thumb {
+                background: rgba(255, 255, 255, 0.4);
+                border-radius: 3px;
+            }
+
+            .plan-category::-webkit-scrollbar-track {
+                background: transparent;
+            }
+
+            .plan-list {
+            display: flex;
+            flex-wrap: wrap;
+            flex-direction: row;
+            justify-content: flex-start;
+            align-items: flex-start;
+            max-height: 300px;      /* Scroll vertically */
+            overflow-y: auto;       /* Enable vertical scroll */
+            gap: 10px;
+            width: 100%;            /* Ensure container width is fixed to parent */
+            max-width: 600px;       /* Adjust so only 3 fit per row */
+            margin: 1rem auto;         /* Center it horizontally */
+        }
+
+        
+
+        .plan-list > .plan-card {
+            flex: 0 0 calc(33.33% - 10px);
+            box-sizing: border-box;
+            font-size: 0.9rem;
+            padding: 0.7rem;
+        }
+
+
+/* Scrollbar styling (optional) */
+.plan-list::-webkit-scrollbar {
+    width: 8px;
+}
+.plan-list::-webkit-scrollbar-thumb {
+    background: #888;
+    border-radius: 4px;
+}
+.plan-list::-webkit-scrollbar-thumb:hover {
+    background: #555;
+}
+
+            /* Recharge-card image and text scaling */
+            .vertical-menu {
+                width: 250px;
+            }
+
+            .recharge-card .logo img {
+                width: 32px;
+                height: 32px;
+            }
+
+            .recharge-card .details {
+                font-size: 0.85rem;
+            }
+        }
+
+        /* Very small devices */
+        @media (max-width: 400px) {
+            .plan-card {
+                width: 100%;
+            }
+
+            .toggle-container {
+                max-width: 260px;
+            }
+
+            .toggle-container a {
+                font-size: 0.85rem;
+            }
+
+            .vertical-menu {
+                width: 80%;
+            }
+
+            .toggle-container {
+                width: 100%;
+                max-width: 260px;
+            }
+
+            .toggle-container a {
+                font-size: 0.85rem;
+                padding: 8px 0;
+            }
+
+            .section-title {
+                font-size: 0.9rem;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- Django messages -->
+    {% if messages %}
+    <div style="max-width:420px;margin-top:10px;">
+        {% for message in messages %}
+        <div style="background:#fff;padding:10px;border-radius:8px;margin-bottom:8px;">{{ message }}</div>
+        {% endfor %}
+    </div>
+    {% endif %}
+    <div class="user-icon" id="userIcon">
+        <img src="https://cdn-icons-png.flaticon.com/512/847/847969.png" width="30" alt="User">
+    </div>
+
+    <!-- Vertical Menu -->
+    <div class="vertical-menu" id="verticalMenu">
+        <div class="my-recharges" style="overflow-y:auto; max-height:400px; padding:10px;">
+            <h4 style="margin-bottom:5px;">Mobile Numbers</h4>
+            {% for rec in my_recharges %}
+            {% if rec.number|length == 10 %}
+            <div class="recharge-card" data-number="{{ rec.number }}"
+                onclick="selectSavedNumber('{{ rec.operator }}', '{{ rec.number }}')">
+                <div class="logo">
+                    <img src="/static/{{ rec.operator|lower }}.png" alt="{{ rec.operator }}">
+                </div>
+                <div class="details">{{ rec.number }}</div>
+            </div>
+            {% endif %}
+            {% endfor %}
+
+            <h4 style="margin-top:15px; margin-bottom:5px;">DTH Numbers</h4>
+            {% for rec in my_recharges %}
+            {% if rec.number|length != 10 %}
+            <div class="recharge-card" data-number="{{ rec.number }}"
+                onclick="selectSavedNumber('{{ rec.operator }}', '{{ rec.number }}')">
+                <div class="logo">
+                    <img src="/static/{{ rec.operator|lower }}.png" alt="{{ rec.operator }}">
+                </div>
+                <div class="details">{{ rec.number }}</div>
+            </div>
+            {% endif %}
+            {% endfor %}
+        </div>
+    </div>
+
+    <div class="second">
+        <div class="container">
+
+            <!-- Toggle Mobile/DTH -->
+            <div class="toggle-container {% if plan_type == 'dth' %}dth-active{% endif %}" id="toggleSwitch">
+                <div class="slider"></div>
+                <a href="#" data-type="mobile" class="{% if plan_type == 'mobile' %}active{% endif %}">Mobile</a>
+                <a href="#" data-type="dth" class="{% if plan_type == 'dth' %}active{% endif %}">DTH</a>
+            </div>
+
+            <!-- Operator selection -->
+            <div class="select-wrapper">
+                <form method="GET" id="operator-form">
+                    <label for="operator">Select Operator</label>
+                    <select id="operator" name="operator" onchange="document.getElementById('operator-form').submit()">
+                        {% for op in operators %}
+                        <option value="{{ op }}" {% if selected_operator == op %}selected{% endif %}>{{ op }}</option>
+                        {% endfor %}
+                    </select>
+                    <input type="hidden" name="type" value="{{ plan_type }}">
+                    {% if selected_category %}
+                    <input type="hidden" name="category" value="{{ selected_category }}">
+                    {% endif %}
+                    <small id="operator-lock-msg" style="color:red; display:block; margin-top:5px;"></small>
+                </form>
+            </div>
+
+            <!-- Recharge form -->
+            <form method="POST" id="rechargeForm" action="{% url 'recharge_demo' %}">
+                {% csrf_token %}
+                <label for="{% if plan_type == 'mobile' %}mobile_number{% else %}dth_number{% endif %}">
+                    {% if plan_type == 'mobile' %}Mobile Number{% else %}DTH Number{% endif %}:
+                </label>
+                <input type="text" id="{% if plan_type == 'mobile' %}mobile_number{% else %}dth_number{% endif %}"
+                    name="{% if plan_type == 'mobile' %}mobile_number{% else %}dth_number{% endif %}" pattern="\d{10}"
+                    maxlength="10" required />
+
+                <input type="hidden" name="selected_plan" id="selectedPlanInput" required />
+                <input type="hidden" name="operator" value="{{ selected_operator }}">
+                <input type="hidden" name="category" value="{{ selected_category }}">
+                <input type="hidden" name="type" value="{{ plan_type }}">
+
+                <button type="button" id="openPinOverlayBtn" disabled>Recharge</button>
+            </form>
+        </div>
+
+
+
+        <!-- Category & Plans -->
+        <div class="select-c">
+            <div class="plan-category">
+                {% for cat in categories %}
+                <li class="category-btn {% if selected_category == cat %}active{% endif %}" data-category="{{ cat }}">
+                    {{ cat }}</li>
+                {% endfor %}
+            </div>
+
+            <div class="plan-list">
+                {% for plan in plans %}
+                <div class="plan-card" data-value="{{ plan.amount }}|{{ plan.validity }}|{{ plan.description }}">
+                    <strong>MRP: ₹{{ plan.amount }}</strong><br />
+                    <small>Validity: {{ plan.validity }}</small><br />
+                    <small>{{ plan.description }}</small>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+    </div>
+
+    <!-- PIN Overlay -->
+    <div id="pinOverlay">
+        <div class="pin-box">
+            <h3>Enter 4-digit PIN</h3>
+            <div class="pin-inputs">
+                <input type="password" maxlength="1" inputmode="numeric" class="pin-input" />
+                <input type="password" maxlength="1" inputmode="numeric" class="pin-input" />
+                <input type="password" maxlength="1" inputmode="numeric" class="pin-input" />
+                <input type="password" maxlength="1" inputmode="numeric" class="pin-input" />
+            </div>
+            <button id="submitPinBtn">Submit</button>
+            <button id="cancelPinBtn" style="background:#aaa; margin-left:10px;">Cancel</button>
+        </div>
+    </div>
+
+    <script>
+        // Toggle Mobile/DTH and reload with ?type=
+        const toggle = document.getElementById('toggleSwitch');
+        const links = toggle.querySelectorAll('a');
+
+        links.forEach(link => {
+            link.addEventListener('click', e => {
+                e.preventDefault();
+                const selectedType = link.getAttribute('data-type');
+
+                // animate slider without moving text
+                toggle.classList.toggle('dth-active', selectedType === 'dth');
+
+                // redirect after animation
+                setTimeout(() => {
+                    const url = new URL(window.location);
+                    url.searchParams.set('type', selectedType);
+
+                    const currentOp = document.getElementById('operator')?.value;
+                    if (currentOp) url.searchParams.set('operator', currentOp);
+
+                    window.location.href = url;
+                }, 300);
+            });
+        });
+
+        // Category buttons (preserve type & operator)
+        document.querySelectorAll('.category-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const category = btn.getAttribute('data-category');
+                const currentUrl = new URL(window.location.href);
+                currentUrl.searchParams.set('category', category);
+                // also preserve operator
+                const currentOp = document.getElementById('operator')?.value;
+                if (currentOp) currentUrl.searchParams.set('operator', currentOp);
+                window.location.href = currentUrl.toString();
+            });
+        });
+
+        // Plan selection & validation
+        const planCards = document.querySelectorAll('.plan-card');
+        const selectedPlanInput = document.getElementById('selectedPlanInput');
+        const openPinBtn = document.getElementById('openPinOverlayBtn');
+        const numberInputId = "{{ plan_type }}" === "mobile" ? "mobile_number" : "dth_number";
+        const numberInput = document.getElementById(numberInputId);
+
+        function validateRechargeReady() {
+            const numberValid = /^\d{10}$/.test(numberInput.value);
+            const planSelected = selectedPlanInput.value.trim() !== "";
+            openPinBtn.disabled = !(numberValid && planSelected);
+        }
+
+        numberInput.addEventListener('input', validateRechargeReady);
+
+        planCards.forEach(card => {
+            card.addEventListener('click', () => {
+                planCards.forEach(c => c.classList.remove('selected'));
+                card.classList.add('selected');
+                selectedPlanInput.value = card.dataset.value;
+                validateRechargeReady();
+            });
+        });
+
+        // PIN overlay
+        const pinOverlay = document.getElementById('pinOverlay');
+        const submitPinBtn = document.getElementById('submitPinBtn');
+        const cancelPinBtn = document.getElementById('cancelPinBtn');
+        const pinInputs = document.querySelectorAll('.pin-input');
+
+        openPinBtn.addEventListener('click', () => {
+            pinInputs.forEach(input => input.value = '');
+            pinOverlay.style.display = 'flex';
+            pinInputs[0].focus();
+        });
+
+        cancelPinBtn.addEventListener('click', () => {
+            pinOverlay.style.display = 'none';
+        });
+
+        // Auto-focus next PIN digit
+        pinInputs.forEach((input, idx) => {
+            input.addEventListener('input', () => {
+                if (input.value.length === 1 && idx < pinInputs.length - 1) {
+                    pinInputs[idx + 1].focus();
+                }
+            });
+            input.addEventListener('keydown', e => {
+                if (e.key === "Backspace" && input.value === "" && idx > 0) {
+                    pinInputs[idx - 1].focus();
+                }
+            });
+        });
+
+        submitPinBtn.addEventListener('click', () => {
+            let pin = '';
+            pinInputs.forEach(input => pin += input.value);
+            if (pin.length !== 4 || !/^\d{4}$/.test(pin)) {
+                alert("Please enter a valid 4-digit PIN.");
+                return;
+            }
+            let hiddenPinInput = document.getElementById('hiddenPinInput');
+            if (!hiddenPinInput) {
+                hiddenPinInput = document.createElement('input');
+                hiddenPinInput.type = 'hidden';
+                hiddenPinInput.name = 'pin';
+                hiddenPinInput.id = 'hiddenPinInput';
+                document.getElementById('rechargeForm').appendChild(hiddenPinInput);
+            }
+            hiddenPinInput.value = pin;
+            pinOverlay.style.display = 'none';
+            document.getElementById('rechargeForm').submit();
+        });
+
+        // Saved numbers quick select
+        function selectSavedNumber(operator, number) {
+            const numberFieldId = "{{ plan_type }}" === "mobile" ? "mobile_number" : "dth_number";
+            document.getElementById(numberFieldId).value = number;
+
+            const operatorSelect = document.getElementById("operator");
+            operatorSelect.value = operator;
+            operatorSelect.disabled = true;
+            document.getElementById("operator-lock-msg").textContent =
+                `Operator is locked to ${operator} for this number.`;
+
+            validateRechargeReady();
+
+            // Hide menu
+            document.getElementById('verticalMenu').classList.remove('show');
+
+            // ✅ Only ask for PIN if a plan is already selected
+            const selectedPlan = document.querySelector(".plan-option.selected");
+            if (selectedPlan) {
+                document.getElementById('pinOverlay').style.display = 'flex';
+            }
+        }
+        window.selectSavedNumber = selectSavedNumber;
+
+        // Allow changing operator if typing new number
+        const mobileField = document.getElementById("mobile_number");
+        if (mobileField) {
+            mobileField.addEventListener("input", function () {
+                const opSel = document.getElementById("operator");
+                opSel.disabled = false;
+                document.getElementById("operator-lock-msg").textContent = "";
+            });
+        }
+
+        const userIcon = document.getElementById('userIcon');
+        const verticalMenu = document.getElementById('verticalMenu');
+
+        // Toggle menu
+        userIcon.addEventListener('click', (event) => {
+            event.stopPropagation();
+            verticalMenu.classList.toggle('show');
+        });
+
+        // Hide when clicking outside
+        document.addEventListener('click', (event) => {
+            if (!verticalMenu.contains(event.target) && !userIcon.contains(event.target)) {
+                verticalMenu.classList.remove('show');
+            }
+        });
+
+        // Horizontal drag-to-scroll for .plan-category
+        const categoryContainer = document.querySelector('.plan-category');
+        let isDown = false;
+        let startX;
+        let scrollLeft;
+
+        if (categoryContainer) {
+            categoryContainer.addEventListener('mousedown', (e) => {
+                isDown = true;
+                categoryContainer.classList.add('dragging');
+                startX = e.pageX - categoryContainer.offsetLeft;
+                scrollLeft = categoryContainer.scrollLeft;
+            });
+
+            categoryContainer.addEventListener('mouseleave', () => {
+                isDown = false;
+                categoryContainer.classList.remove('dragging');
+            });
+
+            categoryContainer.addEventListener('mouseup', () => {
+                isDown = false;
+                categoryContainer.classList.remove('dragging');
+            });
+
+            categoryContainer.addEventListener('mousemove', (e) => {
+                if (!isDown) return;
+                e.preventDefault();
+                const x = e.pageX - categoryContainer.offsetLeft;
+                const walk = (x - startX) * 2; // Scroll speed multiplier
+                categoryContainer.scrollLeft = scrollLeft - walk;
+            });
+        }
+
+
+    </script>
+</body>
+
+</html>

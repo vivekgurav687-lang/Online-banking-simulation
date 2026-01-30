@@ -1,0 +1,294 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Schedule Transfer</title>
+    <style>
+    body {
+      font-family: 'Rubik', sans-serif;
+      background: linear-gradient(135deg, #1f1c2c, #928dab);
+      color: white;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 30px;
+      min-height: 100vh;
+    }
+    h2 {
+      margin-bottom: 20px;
+      font-weight: 500;
+      letter-spacing: 1px;
+      animation: fadeInDown 0.6s ease-out;
+    }
+    .method-toggle {
+      display: flex;
+      gap: 15px;
+      margin-bottom: 20px;
+    }
+    .method-toggle button {
+      padding: 10px 18px;
+      border: none;
+      background: #4e54c8;
+      color: white;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 15px;
+      transition: all 0.25s ease;
+      box-shadow: 0 3px 6px rgba(0,0,0,0.3);
+    }
+    .method-toggle button:hover {
+      background: #5f65e0;
+      transform: translateY(-2px);
+    }
+    .method-toggle button.active {
+      background: #2c2f74;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.4);
+    }
+    form {
+      width: 100%;
+      max-width: 400px;
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+      background: rgba(255,255,255,0.08);
+      padding: 25px;
+      border-radius: 12px;
+      box-shadow: 0 6px 15px rgba(0,0,0,0.25);
+      animation: fadeInUp 0.6s ease-out;
+    }
+    input, select {
+      padding: 10px;
+      border-radius: 6px;
+      border: none;
+      width: 100%;
+      outline: none;
+      font-size: 14px;
+      transition: all 0.2s ease;
+    }
+    input:focus {
+      box-shadow: 0 0 0 2px #6a6ff5;
+    }
+    .error-msg {
+      color: #ff8e8e;
+      font-size: 14px;
+    }
+    button[type="button"], button[type="submit"] {
+      background: linear-gradient(135deg, #4e54c8, #8f94fb);
+      border: none;
+      padding: 12px;
+      border-radius: 8px;
+      color: white;
+      font-size: 15px;
+      cursor: pointer;
+      transition: all 0.25s ease;
+    }
+    button[type="button"]:hover, button[type="submit"]:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+    }
+    .pin-overlay {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100vw; height: 100vh;
+      background-color: rgba(0,0,0,0.8);
+      display: none;
+      justify-content: center;
+      align-items: center;
+      z-index: 999;
+      animation: fadeIn 0.3s ease-out;
+    }
+    .pin-box {
+      background: white;
+      color: black;
+      padding: 20px;
+      border-radius: 10px;
+      display: flex;
+      gap: 10px;
+    }
+    .pin-box input {
+      width: 40px;
+      height: 50px;
+      font-size: 24px;
+      text-align: center;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+      transition: all 0.2s ease;
+    }
+    .pin-box input:focus {
+      border-color: #4e54c8;
+      box-shadow: 0 0 5px rgba(78,84,200,0.4);
+    }
+    .transaction-list {
+      margin-top: 40px;
+      width: 100%;
+      max-width: 500px;
+      animation: fadeInUp 0.6s ease-out;
+    }
+    .transaction-item {
+      background: rgba(255,255,255,0.1);
+      padding: 10px 15px;
+      border-radius: 6px;
+      margin-bottom: 10px;
+      transition: transform 0.2s ease;
+    }
+    .transaction-item:hover {
+      transform: translateX(4px);
+      background: rgba(255,255,255,0.15);
+    }
+
+    /* Animations */
+    @keyframes fadeInUp {
+      from { opacity: 0; transform: translateY(15px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes fadeInDown {
+      from { opacity: 0; transform: translateY(-15px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+  </style>
+</head>
+<body>
+  <h2>Schedule Transfer</h2>
+
+  <div class="method-toggle">
+    <button type="button" class="toggle-btn active" data-method="UPI">UPI</button>
+    <button type="button" class="toggle-btn" data-method="NEFT">NEFT</button>
+    <button type="button" class="toggle-btn" data-method="IMPS">IMPS</button>
+  </div>
+
+  <form id="transferForm" method="POST" action="{% url 'schedule_transfer' %}">
+    {% csrf_token %}
+    <input type="hidden" name="method" id="methodInput" value="UPI" />
+
+    <input type="text" name="receiver_name" placeholder="Receiver Name" readonly required />
+
+    <input type="text" name="receiver_upi" id="upiInput" placeholder="Receiver UPI ID" />
+    <div class="error-msg" id="upiError"></div>
+
+    <input type="text" name="receiver_account" id="accInput" placeholder="Account Number" style="display:none;" />
+    <input type="text" name="ifsc" id="ifscInput" placeholder="IFSC Code" style="display:none;" />
+    <div class="error-msg" id="accError"></div>
+
+    <input type="number" name="amount" placeholder="Amount" required />
+    <input type="datetime-local" name="schedule_datetime" required />
+
+    <button type="button" onclick="openPinOverlay()">Pay</button>
+  </form>
+
+  <!-- PIN Overlay -->
+  <div class="pin-overlay" id="pinOverlay">
+    <div>
+      <div class="pin-box" id="pinBox">
+        <input type="password" maxlength="1" required />
+        <input type="password" maxlength="1" required />
+        <input type="password" maxlength="1" required />
+        <input type="password" maxlength="1" required />
+      </div>
+      <input type="hidden" form="transferForm" name="pin" id="finalPin" />
+      <button type="submit" form="transferForm" style="margin-top: 15px;">Confirm</button>
+    </div>
+  </div>
+
+  <!-- Pending Transactions -->
+  <div class="transaction-list">
+    <h3>Pending Scheduled Transfers</h3>
+    {% for tx in pending %}
+      <div class="transaction-item">
+        <strong>{{ tx.method }}</strong> - ₹{{ tx.amount }} to {{ tx.receiver_name }} on {{ tx.schedule_datetime }}
+      </div>
+    {% empty %}
+      <p>No pending transfers.</p>
+    {% endfor %}
+  </div>
+
+  <script>
+    const methodButtons = document.querySelectorAll('.toggle-btn');
+    const methodInput = document.getElementById('methodInput');
+    const upiInput = document.getElementById('upiInput');
+    const accInput = document.getElementById('accInput');
+    const ifscInput = document.getElementById('ifscInput');
+    const receiverNameField = document.querySelector('input[name="receiver_name"]');
+    const upiError = document.getElementById('upiError');
+    const accError = document.getElementById('accError');
+    const pinOverlay = document.getElementById('pinOverlay');
+    const pinBox = document.querySelectorAll('#pinBox input');
+    const finalPin = document.getElementById('finalPin');
+
+    methodButtons.forEach(btn => {
+      btn.addEventListener('click', () => {
+        methodButtons.forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        methodInput.value = btn.dataset.method;
+
+        if (btn.dataset.method === 'UPI') {
+          upiInput.style.display = 'block';
+          accInput.style.display = 'none';
+          ifscInput.style.display = 'none';
+        } else {
+          upiInput.style.display = 'none';
+          accInput.style.display = 'block';
+          ifscInput.style.display = 'block';
+        }
+      });
+    });
+
+    // Auto-fill name for UPI
+    upiInput.addEventListener('blur', () => {
+      if (!upiInput.value.includes("@")) {
+        upiError.textContent = "Invalid UPI ID";
+        return;
+      }
+      fetch(`/get_beneficiary_name/?upi=${upiInput.value}`)
+        .then(res => res.json())
+        .then(data => {
+          if (data.name) {
+            receiverNameField.value = data.name;
+            upiError.textContent = "";
+          } else {
+            upiError.textContent = "UPI ID not found";
+          }
+        });
+    });
+
+    // Auto-fill name for account
+    ifscInput.addEventListener('blur', () => {
+      if (accInput.value.length < 6 || ifscInput.value.length < 4) {
+        accError.textContent = "Invalid account details";
+        return;
+      }
+      fetch(`/get_beneficiary_name/?acc=${accInput.value}&ifsc=${ifscInput.value}`)
+        .then(res => res.json())
+        .then(data => {
+          if (data.name) {
+            receiverNameField.value = data.name;
+            accError.textContent = "";
+          } else {
+            accError.textContent = "Account not found";
+          }
+        });
+    });
+
+    // Pay click triggers overlay
+    function openPinOverlay() {
+      pinOverlay.style.display = 'flex';
+      pinBox[0].focus();
+    }
+
+    // Auto move focus in pin box
+    pinBox.forEach((input, idx) => {
+      input.addEventListener('input', () => {
+        if (input.value && idx < 3) {
+          pinBox[idx + 1].focus();
+        }
+        let pin = [...pinBox].map(i => i.value).join("");
+        if (pin.length === 4) finalPin.value = pin;
+      });
+    });
+  </script>
+</body>
+</html>

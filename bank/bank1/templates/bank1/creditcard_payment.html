@@ -1,0 +1,487 @@
+{% load static %}
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <title>Credit Card Bill Payment</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style>
+        :root {
+            --bg: #0f172a;
+            --panel: #111827;
+            --muted: #94a3b8;
+            --fg: #e5e7eb;
+            --accent: #22c55e;
+            --danger: #ef4444;
+            --border: #1f2937;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: system-ui, Segoe UI, Roboto, Arial;
+             background: linear-gradient(135deg, #1f1c2c, #928dab);
+            color: var(--fg);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 16px;
+        }
+
+        .card {
+            width: 100%;
+            max-width: 560px;
+            background: rgba(255, 255, 255, .05);
+            backdrop-filter: blur(12px);
+            border-radius: 20px;
+            border-radius: 16px;
+            padding: 20px;
+        }
+
+        .hdr {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+
+        .logo {
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            background: #0ea5e9;
+            display: grid;
+            place-items: center;
+            font-weight: 700;
+        }
+
+        .title {
+            font-size: 18px;
+            font-weight: 700;
+        }
+
+        .muted {
+            color: var(--muted);
+            font-size: 12px;
+        }
+
+        form label {
+            font-size: 13px;
+            color: var(--muted);
+            margin: 12px 2px 6px;
+            display: block;
+        }
+
+        input,
+        select {
+            width: 100%;
+            background: white;
+            border: none;
+            border-radius: 10px;
+            padding: 12px 14px;
+            outline: none;
+        }
+
+        input:focus {
+            border-color: #334155;
+        }
+
+        .row {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .row-2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+
+        .issuer-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+            gap: 12px;
+            margin-top: 8px;
+        }
+
+        .issuer-option {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            border: 1px solid transparent;
+            border-radius: 12px;
+            padding: 10px;
+            cursor: pointer;
+            transition: all .2s ease;
+            text-align: center;
+            background: white;
+        }
+
+        .issuer-option input {
+            display: none;
+        }
+
+        .issuer-option img {
+            width: 40px;
+            height: 40px;
+            margin-bottom: 6px;
+            object-fit: contain;
+            background: transparent;
+        }
+
+        .issuer-option span {
+            font-size: 13px;
+            color: black;
+        }
+
+        .issuer-option:hover {
+           border: solid #334155;
+           color: white;
+        }
+
+        .issuer-option input:checked~span {
+            font-weight: bold;
+            color: var(--accent);
+        }
+
+        .issuer-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: #f3f4f6;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            margin-top: 10px;
+        }
+        .issuer-avatar-img {
+            width: 80%;
+            height: 80%;
+            object-fit: contain;
+        }
+
+
+        .paybar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            padding-top: 14px;
+            border-top: 1px dashed var(--border);
+            margin-top: 14px;
+        }
+
+        .amount-preview {
+            font-weight: 700;
+            font-size: 18px;
+        }
+
+        .btn {
+            border: 0;
+            background: #aba5c6;
+            color: #051b0f;
+            font-weight: 800;
+            padding: 12px 16px;
+            border-radius: 10px;
+            cursor: pointer;
+        }
+
+        .btn[disabled] {
+            opacity: .6;
+            cursor: not-allowed;
+        }
+
+        .btn:hover{
+            transform: scale(1.01);
+        }
+
+        .err {
+            color: var(--danger);
+            font-size: 12px;
+            margin-top: 6px;
+        }
+
+        /* Overlay */
+        .overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, .6);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 50;
+        }
+
+        .overlay.show {
+            display: flex;
+        }
+
+        .pin-card {
+            width: 92%;
+            max-width: 360px;
+            background: #0b1220;
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            padding: 18px;
+        }
+
+        .pin-title {
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+
+        .pin-inputs {
+            display: flex;
+            gap: 10px;
+            margin: 10px 0 14px;
+        }
+
+        .pin-inputs input {
+            width: 58px;
+            height: 58px;
+            text-align: center;
+            font-size: 24px;
+            border-radius: 12px;
+        }
+
+        .pin-actions {
+            display: flex;
+            gap: 8px;
+            justify-content: flex-end;
+        }
+
+        .btn-ghost {
+            background: #111827;
+            color: var(--fg);
+        }
+
+        /* Messages */
+        .msg {
+            margin-bottom: 8px;
+        }
+
+        /* Responsive */
+        @media(max-width: 480px) {
+            .title {
+                font-size: 16px;
+            }
+
+            .amount-preview {
+                font-size: 16px;
+            }
+
+            .issuer-option {
+                padding: 8px;
+            }
+
+            .issuer-option img {
+                width: 32px;
+                height: 32px;
+            }
+
+            .row-2 {
+                grid-template-columns: 1fr;
+            }
+
+            .pin-inputs input {
+                width: 48px;
+                height: 48px;
+                font-size: 20px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="card">
+        <div class="hdr">
+            <div class="logo">CC</div>
+            <div>
+                <div class="title">Credit Card Bill Payment</div>
+                <div class="muted">Pay your credit card dues instantly</div>
+            </div>
+        </div>
+
+        {% if messages %}
+        {% for m in messages %}
+        <div class="msg" style="color:{% if 'error' in m.tags %}var(--danger){% else %}var(--accent){% endif %};">
+            {{ m }}
+        </div>
+        {% endfor %}
+        {% endif %}
+
+        <form id="ccForm" method="post" novalidate>
+            {% csrf_token %}
+            <label>Issuer</label>
+            <div class="issuer-list">
+                {% for issuer in issuers %}
+                <label class="issuer-option">
+                    <input type="radio" name="issuer" value="{{ issuer.name }}" required>
+                    <img src="{% static 'banks/' %}{{ issuer.logo }}" alt="{{ issuer.name }}">
+                    <span>{{ issuer.name }}</span>
+                </label>
+                {% endfor %}
+            </div>
+
+            <div class="row">
+                <div style="flex:1">
+                    <label for="card_number">Card Number</label>
+                    <input id="card_number" name="card_number" inputmode="numeric" autocomplete="cc-number"
+                        placeholder="#### #### #### ####" maxlength="23" required>
+                    <div id="card_err" class="err" style="display:none;">Invalid card number</div>
+                </div>
+                <div style="width:64px; display:flex; align-items:flex-end; justify-content:center;">
+                    <div class="issuer-avatar" id="issuerAvatar">?</div>
+                </div>
+            </div>
+
+            <label for="cardholder">Cardholder Name</label>
+            <input id="cardholder" name="cardholder" autocomplete="cc-name" placeholder="As printed on the card"
+                required>
+
+            <div class="row-2">
+                <div>
+                    <label for="amount">Amount (₹)</label>
+                    <input id="amount" name="amount" inputmode="decimal" placeholder="0.00" required>
+                </div>
+                <div>
+                    <label for="remarks">Remarks (optional)</label>
+                    <input id="remarks" name="remarks" placeholder="e.g., August bill">
+                </div>
+            </div>
+
+            <input type="hidden" id="tpin" name="tpin">
+
+            <div class="paybar">
+                <div class="amount-preview" id="amtPrev">—</div>
+                <button type="button" id="payBtn" class="btn">Pay Bill</button>
+            </div>
+        </form>
+    </div>
+
+    <!-- PIN Overlay -->
+    <div id="pinOverlay" class="overlay" aria-modal="true" role="dialog">
+        <div class="pin-card">
+            <div class="pin-title">Enter your 4-digit T-PIN</div>
+            <div class="help">For security, do not share this PIN with anyone.</div>
+            <div class="pin-inputs">
+                <input maxlength="1" inputmode="numeric">
+                <input maxlength="1" inputmode="numeric">
+                <input maxlength="1" inputmode="numeric">
+                <input maxlength="1" inputmode="numeric">
+            </div>
+            <div id="pinErr" class="err" style="display:none;">Please enter all 4 digits.</div>
+            <div class="pin-actions">
+                <button type="button" class="btn btn-ghost" id="cancelPin">Cancel</button>
+                <button type="button" class="btn" id="confirmPin">Confirm & Pay</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const issuerRadios = document.querySelectorAll("input[name='issuer']");
+        const issuerAvatar = document.getElementById('issuerAvatar');
+
+        issuerRadios.forEach(radio => {
+            radio.addEventListener('change', () => {
+                if (radio.checked) {
+                    // Use the correct logo path
+                    const logoSrc = `/static/banks/${radio.value.toLowerCase().replace(/\s+/g, '')}.png`;
+                    issuerAvatar.innerHTML = `<img src="${logoSrc}" alt="${radio.value}">`;
+                }
+            });
+        });
+
+        const cardInput = document.getElementById('card_number');
+        const cardErr = document.getElementById('card_err');
+        const amountInput = document.getElementById('amount');
+        const amtPrev = document.getElementById('amtPrev');
+        const payBtn = document.getElementById('payBtn');
+        const form = document.getElementById('ccForm');
+
+        const pinOverlay = document.getElementById('pinOverlay');
+        const pinBoxes = Array.from(pinOverlay.querySelectorAll('.pin-inputs input'));
+        const cancelPinBtn = document.getElementById('cancelPin');
+        const confirmPinBtn = document.getElementById('confirmPin');
+        const pinErr = document.getElementById('pinErr');
+        const tpinHidden = document.getElementById('tpin');
+
+        function formatCard(val) {
+            return val.replace(/\D/g, '').replace(/(.{4})/g, '$1 ').trim();
+        }
+        cardInput.addEventListener('input', () => {
+            cardInput.value = formatCard(cardInput.value);
+            const digits = cardInput.value.replace(/\s/g, '');
+            cardErr.style.display = (digits.length >= 12 && !luhnOk(digits)) ? 'block' : 'none';
+        });
+        function luhnOk(num) {
+            if (!/^\d{12,19}$/.test(num)) return false;
+            let s = 0, dbl = false;
+            for (let i = num.length - 1; i >= 0; i--) {
+                let n = parseInt(num[i], 10);
+                if (dbl) { n *= 2; if (n > 9) n -= 9; }
+                s += n; dbl = !dbl;
+            }
+            return (s % 10) === 0;
+        }
+
+        function updateAmtPrev() {
+            const n = parseFloat(amountInput.value.replace(/,/g, ''));
+            amtPrev.textContent = isNaN(n) || n <= 0 ? '—' : `₹ ${n.toFixed(2)}`;
+        }
+        amountInput.addEventListener('input', updateAmtPrev);
+        updateAmtPrev();
+
+        payBtn.addEventListener('click', () => {
+            const issuer = Array.from(issuerRadios).find(r => r.checked)?.value || "";
+            const card = cardInput.value.replace(/\s/g, '');
+            const holder = document.getElementById('cardholder').value.trim();
+            const amt = parseFloat(amountInput.value);
+
+            if (!issuer) { alert('Select issuer'); return; }
+            if (!luhnOk(card)) { cardErr.style.display = 'block'; cardInput.focus(); return; }
+            if (holder.length < 3) { alert('Enter cardholder name'); return; }
+            if (!amt || amt <= 0) { alert('Enter a valid amount'); return; }
+
+            pinBoxes.forEach(b => { b.value = ''; });
+            pinErr.style.display = 'none';
+            pinOverlay.classList.add('show');
+            setTimeout(() => pinBoxes[0].focus(), 50);
+        });
+
+        pinBoxes.forEach((box, idx) => {
+            box.addEventListener('input', (e) => {
+                e.target.value = e.target.value.replace(/\D/g, '').slice(0, 1);
+                if (e.target.value && idx < pinBoxes.length - 1) {
+                    pinBoxes[idx + 1].focus();
+                }
+            });
+            box.addEventListener('keydown', (e) => {
+                if (e.key === 'Backspace' && !e.target.value && idx > 0) {
+                    pinBoxes[idx - 1].focus();
+                }
+            });
+        });
+
+        cancelPinBtn.addEventListener('click', () => pinOverlay.classList.remove('show'));
+        confirmPinBtn.addEventListener('click', () => {
+            const pin = pinBoxes.map(b => b.value).join('');
+            if (pin.length !== 4) { pinErr.style.display = 'block'; return; }
+            tpinHidden.value = pin;
+            confirmPinBtn.disabled = true;
+            payBtn.disabled = true;
+            form.submit();
+        });
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Edit UPI PIN</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      scroll-behavior: smooth;
+    }
+
+    body {
+      font-family: 'Rubik', sans-serif;
+      background: linear-gradient(135deg, #1f1c2c, #928dab);
+      color: #fff;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      padding: 10px;
+    }
+
+    .pin-form-container {
+      width: 90%;
+      max-width: 400px;
+      background: rgba(255, 255, 255, 0.05);
+      backdrop-filter: blur(12px);
+      padding: 30px 25px;
+      border-radius: 16px;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+    }
+
+    .pin-form-container h2 {
+      text-align: center;
+      margin-bottom: 24px;
+      font-size: 2rem;
+      font-family: 'Inter';
+      color: #fff;
+    }
+
+    .pin-form-container label {
+      display: block;
+      margin-bottom: 8px;
+      font-weight: 500;
+      color: #fff;
+    }
+
+    .pin-form-container input[type="password"] {
+      width: 100%;
+      padding: 12px;
+      border-radius: 10px;
+      border: none;
+      font-size: 16px;
+      margin-bottom: 20px;
+      background: rgba(255, 255, 255, 0.1);
+      color: #fff;
+      transition: border-color 0.3s;
+    }
+
+    .pin-form-container input[type="password"]::placeholder {
+      color: #eee;
+      opacity: 0.6;
+    }
+
+    .pin-form-container input[type="password"]:focus {
+      outline: 2px solid #928dab;
+    }
+
+    .pin-form-container button {
+      background-color: #928dab;
+      color: #1f1c2c;
+      font-weight: bold;
+      padding: 12px;
+      border: none;
+      border-radius: 10px;
+      width: 100%;
+      cursor: pointer;
+      font-size: 16px;
+      transition: background-color 0.3s ease, transform 0.2s ease;
+    }
+
+    .pin-form-container button:hover {
+      background-color: #b3a1d8;
+      transform: scale(1.02);
+    }
+
+    @media (max-width: 600px) {
+      .pin-form-container {
+        padding: 25px 20px;
+      }
+
+      .pin-form-container h2 {
+        font-size: 1.6rem;
+      }
+
+      .pin-form-container input,
+      .pin-form-container button {
+        font-size: 15px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="pin-form-container">
+    <h2>Edit UPI PIN</h2>
+    <form method="post">
+      {% csrf_token %}
+      <Span>Old Pin :  </Span>{{ user.userprofile.upi_pin }}
+      <label>New UPI PIN</label>
+      <input type="password" name="new_upi_pin" placeholder="Enter new PIN" required>
+
+      <label>Confirm UPI PIN</label>
+      <input type="password" name="confirm_upi_pin" placeholder="Re-enter new PIN" required>
+
+      <button type="submit">Update</button>
+    </form>
+  </div>
+</body>
+</html>

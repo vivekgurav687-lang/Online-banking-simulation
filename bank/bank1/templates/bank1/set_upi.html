@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Set UPI ID and PIN</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link href="https://fonts.googleapis.com/css2?family=Rubik&display=swap" rel="stylesheet" />
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Rubik', sans-serif;
+      background: linear-gradient(135deg, #1f1c2c, #928dab);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      margin: 0;
+      padding: 20px;
+      color: white;
+    }
+
+    .form-container {
+      background: rgba(255, 255, 255, 0.08);
+      backdrop-filter: blur(12px);
+      border-radius: 16px;
+      padding: 30px;
+      width: 100%;
+      max-width: 420px;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+    }
+
+    h2 {
+      text-align: center;
+      margin-bottom: 24px;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 8px;
+      font-weight: 500;
+    }
+
+    input[type="text"],
+    input[type="password"] {
+      width: 100%;
+      padding: 12px;
+      border-radius: 8px;
+      border: none;
+      margin-bottom: 20px;
+      background-color: rgba(255, 255, 255, 0.2);
+      color: white;
+      font-size: 16px;
+    }
+
+    input::placeholder {
+      color: rgba(255, 255, 255, 0.6);
+    }
+
+    button {
+      width: 100%;
+      padding: 14px;
+      background-color: #00c853;
+      border: none;
+      border-radius: 10px;
+      color: white;
+      font-size: 17px;
+      cursor: pointer;
+      transition: background 0.3s ease;
+    }
+
+    button:hover {
+      background-color: #00b347;
+    }
+
+    .step {
+      display: none;
+    }
+
+    .step.active {
+      display: block;
+    }
+
+    .error {
+      color: #ff5252;
+      margin-bottom: 10px;
+      font-size: 14px;
+    }
+
+    @media (max-width: 480px) {
+      .form-container {
+        padding: 20px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <form class="form-container" method="post" onsubmit="return validateStep2()">
+    {% csrf_token %}
+    <h2>Set UPI Details</h2>
+
+    <!-- Step 1: UPI ID -->
+    <div class="step active" id="step1">
+      <label for="upi_id">Enter UPI ID:</label>
+      <input type="text" name="upi_id" id="upi_id" placeholder="e.g. name@bank" required />
+      <div class="error" id="upiError"></div>
+      <button type="button" onclick="nextStep()">Next</button>
+    </div>
+
+    <!-- Step 2: UPI PIN -->
+    <div class="step" id="step2">
+      <label for="upi_pin">Set 4-digit UPI PIN:</label>
+      <input type="password" name="upi_pin" id="upi_pin" maxlength="4" pattern="\d{4}" inputmode="numeric" placeholder="Enter 4-digit PIN" required />
+
+      <label for="confirm_upi_pin">Confirm UPI PIN:</label>
+      <input type="password" name="confirm_upi_pin" id="confirm_upi_pin" maxlength="4" pattern="\d{4}" inputmode="numeric" placeholder="Re-enter 4-digit PIN" required />
+      
+      <div class="error" id="pinError"></div>
+      <button type="submit">Save Details</button>
+    </div>
+  </form>
+
+  <script>
+    function nextStep() {
+      const upiId = document.getElementById('upi_id').value.trim();
+      const errorBox = document.getElementById('upiError');
+
+      if (!upiId || !upiId.includes('@')) {
+        errorBox.textContent = "Please enter a valid UPI ID.";
+        return;
+      }
+
+      errorBox.textContent = '';
+      document.getElementById('step1').classList.remove('active');
+      document.getElementById('step2').classList.add('active');
+    }
+
+    function validateStep2() {
+      const pin = document.getElementById('upi_pin').value;
+      const confirmPin = document.getElementById('confirm_upi_pin').value;
+      const errorBox = document.getElementById('pinError');
+
+      if (pin.length !== 4 || isNaN(pin)) {
+        errorBox.textContent = "UPI PIN must be exactly 4 digits.";
+        return false;
+      }
+
+      if (pin !== confirmPin) {
+        errorBox.textContent = "UPI PINs do not match.";
+        return false;
+      }
+
+      return true;
+    }
+  </script>
+</body>
+</html>

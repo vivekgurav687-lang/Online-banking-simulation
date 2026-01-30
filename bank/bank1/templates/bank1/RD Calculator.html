@@ -1,0 +1,121 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>FD & RD Calculator</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f9f9f9;
+            padding: 30px;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: auto;
+            background: #fff;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+        }
+
+        h2 {
+            text-align: center;
+        }
+
+        label {
+            display: block;
+            margin-top: 10px;
+        }
+
+        select,
+        input {
+            width: 100%;
+            padding: 8px;
+            margin-top: 5px;
+            border-radius: 6px;
+            border: 1px solid #ccc;
+        }
+
+        button {
+            margin-top: 15px;
+            padding: 10px;
+            width: 100%;
+            background: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background: #45a049;
+        }
+
+        .result {
+            margin-top: 20px;
+            padding: 15px;
+            background: #f0f8ff;
+            border-radius: 6px;
+        }
+
+        .coming-soon {
+            text-align: center;
+            color: red;
+            margin-top: 15px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h2>FD / RD Calculator</h2>
+        <form method="post">
+            {% csrf_token %}
+            <label>Select Bank</label>
+            <select name="bank" required>
+                <option value="">-- Select Bank --</option>
+                <option value="SBI">SBI</option>
+                <option value="HDFC">HDFC</option>
+                <option value="ICICI">ICICI</option>
+                <option value="Axis">Axis</option>
+            </select>
+
+            <label>Select Type</label>
+            <select name="type" required>
+                <option value="FD">Fixed Deposit (FD)</option>
+                <option value="RD">Recurring Deposit (RD)</option>
+            </select>
+
+            <label>Enter Amount (₹)</label>
+            <input type="number" name="amount" min="1000" required>
+
+            <button type="submit">Calculate</button>
+        </form>
+
+        {% if result %}
+        <div class="result">
+            <h3>{{ bank }} - {{ type }}</h3>
+            <p>Principal: ₹{{ amount }}</p>
+            <table border="1" width="100%" cellpadding="5">
+                <tr>
+                    <th>Period</th>
+                    <th>Maturity Amount</th>
+                </tr>
+                {% for year, val in result.items %}
+                <tr>
+                    <td>{{ year }} Years</td>
+                    <td>₹{{ val }}</td>
+                </tr>
+                {% endfor %}
+            </table>
+        </div>
+        {% endif %}
+
+        <div class="coming-soon">✨ FD / RD Registration Coming Soon ✨</div>
+    </div>
+</body>
+
+</html>

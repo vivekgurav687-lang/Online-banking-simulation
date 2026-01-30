@@ -1,0 +1,187 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Pay {{ beneficiary.user.get_full_name|default:beneficiary.user }}</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 20px;
+      height: 100vh;
+    }
+
+    .beneficiary-card {
+      display: flex;
+      align-items: center;
+      flex-direction: column;
+      margin-bottom: 15px;
+    }
+
+    .avatar {
+      width: 60px;
+      height: 60px;
+    }
+
+    .beneficiary-name {
+      font-weight: bold;
+      font-size: 1.2em;
+      margin-top: 8px;
+    }
+
+    .amount-section {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 2em;
+      margin: 15px 0;
+    }
+
+    .rupee {
+      margin-right: 8px;
+    }
+
+    .slide-toggle {
+      display: flex;
+      justify-content: space-around;
+      margin-bottom: 15px;
+    }
+
+    .option {
+      padding: 10px;
+      cursor: pointer;
+      background: #ddd;
+      border-radius: 5px;
+    }
+
+    .option.active {
+      background: #4CAF50;
+      color: white;
+    }
+
+    button {
+      background: #4CAF50;
+      color: white;
+      border: none;
+      padding: 12px;
+      width: 100%;
+      font-size: 1em;
+      border-radius: 8px;
+      margin-top: 15px;
+    }
+
+    input[type="number"],
+    input[type="password"] {
+      width: 100%;
+      font-size: 1em;
+      padding: 10px;
+      margin-top: 5px;
+      margin-bottom: 10px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+    }
+
+    label {
+      font-weight: bold;
+      display: block;
+      margin-top: 10px;
+    }
+
+    .error {
+      color: red;
+      margin-bottom: 10px;
+      text-align: center;
+    }
+
+    .hidden {
+      display: none;
+    }
+
+    .fade-in {
+      animation: fadeIn 0.4s ease-in forwards;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: scale(0.98); }
+      to { opacity: 1; transform: scale(1); }
+    }
+  </style>
+</head>
+<body>
+  <form method="post" action="{% url 'pay_beneficiary' beneficiary.id %}">
+    {% csrf_token %}
+
+    {% if error %}
+      <div class="error">{{ error }}</div>
+    {% endif %}
+
+    <div class="beneficiary-card">
+      <img src="{% static 'letters/' %}{{ beneficiary.name|slice:":1"|upper }}.png" class="avatar" alt="Letter">
+      <div class="beneficiary-name">{{ beneficiary.name }}</div>
+    </div>
+
+    <div class="amount-section">
+      <span class="rupee">₹</span>
+      <input type="number" name="amount" id="amountInput" placeholder="0" required />
+    </div>
+
+    <div class="slide-toggle" id="methodToggle">
+      <div class="option active" data-method="UPI">UPI</div>
+      <div class="option" data-method="IMPS">IMPS</div>
+      <div class="option" data-method="NEFT">NEFT</div>
+    </div>
+
+    <input type="hidden" name="method" id="paymentMethod" value="UPI">
+
+    <div id="pinField" class="hidden">
+      <label for="pinInput" id="pinLabel">Enter PIN</label>
+      <input type="password" name="pin" id="pinInput" maxlength="6" />
+    </div>
+
+    <button type="button" id="payBtn">Pay via UPI</button>
+  </form>
+
+  <script>
+    const options = document.querySelectorAll('.option');
+    const methodInput = document.getElementById('paymentMethod');
+    const payBtn = document.getElementById('payBtn');
+    const pinField = document.getElementById('pinField');
+    const pinInput = document.getElementById('pinInput');
+    const pinLabel = document.getElementById('pinLabel');
+
+    let confirmMode = false;
+
+    options.forEach((option) => {
+      option.addEventListener('click', () => {
+        options.forEach(o => o.classList.remove('active'));
+        option.classList.add('active');
+        const method = option.dataset.method;
+        methodInput.value = method;
+        payBtn.textContent = `Pay via ${method}`;
+        confirmMode = false;
+        pinField.classList.add('hidden');
+      });
+    });
+
+    payBtn.addEventListener('click', () => {
+      if (!confirmMode) {
+        // First click: Show PIN input
+        const method = methodInput.value;
+        pinLabel.textContent = method === "UPI" ? "Enter UPI PIN" : "Enter T-PIN";
+        pinField.classList.remove('hidden');
+        pinField.classList.add('fade-in');
+        payBtn.textContent = "Confirm Payment";
+        confirmMode = true;
+      } else {
+        // Second click: If PIN is entered, submit the form
+        if (pinInput.value.trim() === "") {
+          alert("Please enter your PIN.");
+          return;
+        }
+        payBtn.closest('form').submit();
+      }
+    });
+  </script>
+</body>
+</html>

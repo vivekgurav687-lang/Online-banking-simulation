@@ -1,0 +1,700 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Request & Manage Money Requests (UPI)</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter&display=swap" rel="stylesheet" />
+    <style>
+        :root {
+            /* Dark Mode Variables */
+            --dark-bg: linear-gradient(135deg, #1f1c2c, #928dab);
+            --dark-text: #fff;
+            --dark-glass-bg: rgba(255, 255, 255, 0.15);
+            --dark-header-bg: rgba(255, 255, 255, 0.05);
+            --dark-icon-bg: rgba(255, 255, 255, 0.06);
+            --dark-icon-border: rgba(255, 255, 255, 0.12);
+            --dark-h2-color: #d1cbe6;
+            --dark-box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
+            --dark-button-bg: #00c853;
+            --dark-button-hover: #00b347;
+            --dark-error-bg: #f8d7da;
+            --dark-error-text: #721c24;
+            --dark-success-bg: #d4edda;
+            --dark-success-text: #155724;
+            --dark-info-bg: #e2e3e5;
+            --dark-info-text: #383d41;
+
+            /* Light Mode Variables */
+            --light-bg: #f4f6f8;
+            --light-text: #333;
+            --light-glass-bg: rgba(255, 255, 255, 0.85);
+            --light-header-bg: rgba(255, 255, 255, 0.95);
+            --light-icon-bg: rgba(230, 230, 230, 0.8);
+            --light-icon-border: rgba(200, 200, 200, 0.8);
+            --light-h2-color: #555;
+            --light-box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            --light-button-bg: #4caf50;
+            --light-button-hover: #3e8e41;
+            --light-error-bg: #f8d7da;
+            --light-error-text: #721c24;
+            --light-success-bg: #d4edda;
+            --light-success-text: #155724;
+            --light-info-bg: #e2e3e5;
+            --light-info-text: #383d41;
+        }
+
+        /* Reset */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--dark-bg);
+            color: var(--dark-text);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transition: background 0.5s ease, color 0.5s ease;
+        }
+
+        body.light-mode {
+            background: var(--light-bg);
+            color: var(--light-text);
+        }
+
+        /* Container with glass effect */
+        .container {
+            max-width: 600px;
+            width:100%;
+            /* background: var(--dark-glass-bg); */
+            backdrop-filter: blur(10px);
+            border-radius: 12px;
+            /* padding: 30px; */
+            transition: background 0.5s ease, box-shadow 0.5s ease, color 0.5s ease;
+            color: var(--dark-text);
+        }
+
+        .first,.second {
+            padding: 10px;
+            margin-top: 10px;
+            border-radius: 20px;
+            background: rgba(255, 255, 255, 0.193);
+            backdrop-filter: blur(8px);
+        }
+
+        body.light-mode .container {
+            background: var(--light-glass-bg);
+            box-shadow: var(--light-box-shadow);
+            color: var(--light-text);
+        }
+
+        /* Headings */
+        h1 {
+            margin-bottom: 30px;
+            font-weight: 600;
+            color: var(--dark-h2-color);
+            transition: color 0.5s ease;
+        }
+
+        body.light-mode h1 {
+            color: var(--light-h2-color);
+        }
+
+        /* Form styling */
+        form label {
+            display: block;
+            margin-top: 20px;
+            font-weight: 600;
+            color: inherit;
+            user-select: none;
+        }
+
+        form input,
+        form textarea {
+            width: 100%;
+            padding: 10px 12px;
+            margin-top: 8px;
+            border-radius: 8px;
+            border: 1.5px solid var(--dark-icon-border);
+            background: var(--dark-icon-bg);
+            color: var(--dark-text);
+            font-size: 1rem;
+            transition: background 0.3s ease, border-color 0.3s ease, color 0.3s ease;
+            font-family: inherit;
+            resize: vertical;
+        }
+
+        body.light-mode form input,
+        body.light-mode form textarea {
+            background: var(--light-icon-bg);
+            border: 1.5px solid var(--light-icon-border);
+            color: var(--light-text);
+        }
+
+        form input:focus,
+        form textarea:focus {
+            border-color: var(--dark-button-bg);
+            outline: none;
+            box-shadow: 0 0 8px var(--dark-button-bg);
+        }
+
+        body.light-mode form input:focus,
+        body.light-mode form textarea:focus {
+            border-color: var(--light-button-bg);
+            box-shadow: 0 0 8px var(--light-button-bg);
+        }
+
+        /* Submit Button */
+        form button {
+            margin-top: 25px;
+            width: 100%;
+            padding: 14px 0;
+            background: var(--dark-button-bg);
+            border: none;
+            border-radius: 10px;
+            color: white;
+            font-weight: 700;
+            font-size: 1.1rem;
+            cursor: pointer;
+            transition: background 0.3s ease;
+            user-select: none;
+        }
+
+        form button:hover {
+            background: var(--dark-button-hover);
+        }
+
+        body.light-mode form button {
+            background: var(--light-button-bg);
+        }
+
+        body.light-mode form button:hover {
+            background: var(--light-button-hover);
+        }
+
+        /* Divider */
+        /* hr {
+            margin: 50px 0;
+            border: none;
+            height: 1px;
+            background: var(--dark-icon-border);
+            opacity: 0.4;
+        } */
+
+        body.light-mode hr {
+            background: var(--light-icon-border);
+        }
+
+        /* Requests List */
+        .request-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 18px 0;
+            border-bottom: 1px solid var(--dark-icon-border);
+            transition: border-color 0.5s ease;
+            color: var(--dark-text);
+        }
+
+        body.light-mode .request-item {
+            border-bottom: 1px solid var(--light-icon-border);
+            color: var(--light-text);
+        }
+
+        .request-info {
+            flex-grow: 1;
+            user-select: none;
+        }
+
+        .request-info strong {
+            font-size: 1.15rem;
+            font-weight: 700;
+            color: var(--dark-button-bg);
+            transition: color 0.5s ease;
+        }
+
+        body.light-mode .request-info strong {
+            color: var(--light-button-bg);
+        }
+
+        .request-info small {
+            display: block;
+            margin-top: 4px;
+            font-style: italic;
+            color: var(--dark-icon-border);
+        }
+
+        body.light-mode .request-info small {
+            color: var(--light-icon-border);
+        }
+
+        .status {
+            margin-top: 6px;
+            font-style: italic;
+            font-weight: 600;
+            color: var(--dark-icon-border);
+        }
+
+        body.light-mode .status {
+            color: var(--light-icon-border);
+        }
+
+        /* Buttons in request list */
+        .btn {
+            border: none;
+            padding: 10px 18px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 700;
+            margin-left: 10px;
+            transition: background 0.3s ease;
+            user-select: none;
+            font-size: 0.9rem;
+            min-width: 90px;
+        }
+
+        .btn-approve {
+            background: var(--dark-button-bg);
+            color: white;
+        }
+
+        .btn-approve:hover {
+            background: var(--dark-button-hover);
+        }
+
+        body.light-mode .btn-approve {
+            background: var(--light-button-bg);
+        }
+
+        body.light-mode .btn-approve:hover {
+            background: var(--light-button-hover);
+        }
+
+        .btn-decline {
+            background: #dc3545;
+            color: white;
+        }
+
+        .btn-decline:hover {
+            background: #c82333;
+        }
+
+        .btn-later {
+            background: #ffc107;
+            color: #333;
+        }
+
+        .btn-later:hover {
+            background: #e0a800;
+        }
+
+        /* Modal overlay */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.65);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .modal {
+            background: var(--dark-glass-bg);
+            backdrop-filter: blur(12px);
+            padding: 30px 40px;
+            border-radius: 20px;
+            max-width: 420px;
+            width: 90%;
+            box-shadow: var(--dark-box-shadow);
+            text-align: center;
+            color: var(--dark-text);
+            transition: background 0.5s ease, color 0.5s ease, box-shadow 0.5s ease;
+            user-select: none;
+        }
+
+        body.light-mode .modal {
+            background: var(--light-glass-bg);
+            box-shadow: var(--light-box-shadow);
+            color: var(--light-text);
+        }
+
+        .modal h2 {
+            margin-bottom: 20px;
+            font-weight: 700;
+            font-size: 1.8rem;
+        }
+
+        #modalText {
+            margin-bottom: 25px;
+            font-size: 1.1rem;
+        }
+
+        /* PIN blocks */
+        #pinBlocks {
+            display: flex;
+            justify-content: center;
+            gap: 16px;
+            margin-bottom: 30px;
+        }
+
+        .pin-block {
+            width: 48px;
+            height: 60px;
+            font-size: 2.4rem;
+            text-align: center;
+            border-radius: 14px;
+            border: 2.5px solid var(--dark-icon-border);
+            background: var(--dark-icon-bg);
+            color: var(--dark-text);
+            font-family: 'Inter', sans-serif;
+            user-select: none;
+            transition: border-color 0.3s ease, background 0.3s ease, color 0.3s ease;
+        }
+
+        .pin-block:focus {
+            border-color: var(--dark-button-bg);
+            outline: none;
+            box-shadow: 0 0 8px var(--dark-button-bg);
+        }
+
+        body.light-mode .pin-block {
+            background: var(--light-icon-bg);
+            border: 2.5px solid var(--light-icon-border);
+            color: var(--light-text);
+        }
+
+        body.light-mode .pin-block:focus {
+            border-color: var(--light-button-bg);
+            box-shadow: 0 0 8px var(--light-button-bg);
+        }
+
+        /* Modal buttons */
+        .modal button {
+            padding: 12px 24px;
+            font-weight: 700;
+            border-radius: 10px;
+            border: none;
+            cursor: pointer;
+            user-select: none;
+            font-size: 1rem;
+            transition: background 0.3s ease;
+        }
+
+        .btn-confirm {
+            background: var(--dark-button-bg);
+            color: white;
+        }
+
+        .btn-confirm:hover {
+            background: var(--dark-button-hover);
+        }
+
+        body.light-mode .btn-confirm {
+            background: var(--light-button-bg);
+        }
+
+        body.light-mode .btn-confirm:hover {
+            background: var(--light-button-hover);
+        }
+
+        .btn-cancel {
+            background: #6c757d;
+            color: white;
+            margin-left: 16px;
+        }
+
+        .btn-cancel:hover {
+            background: #5a6268;
+        }
+
+        /* Messages */
+        .message {
+            padding: 14px 20px;
+            margin-bottom: 20px;
+            border-radius: 12px;
+            font-weight: 600;
+            user-select: none;
+            font-size: 1rem;
+        }
+
+        .message.error {
+            background-color: var(--dark-error-bg);
+            color: var(--dark-error-text);
+        }
+
+        body.light-mode .message.error {
+            background-color: var(--light-error-bg);
+            color: var(--light-error-text);
+        }
+
+        .message.success {
+            background-color: var(--dark-success-bg);
+            color: var(--dark-success-text);
+        }
+
+        body.light-mode .message.success {
+            background-color: var(--light-success-bg);
+            color: var(--light-success-text);
+        }
+
+        .message.info {
+            background-color: var(--dark-info-bg);
+            color: var(--dark-info-text);
+        }
+
+        body.light-mode .message.info {
+            background-color: var(--light-info-bg);
+            color: var(--light-info-text);
+        }
+
+
+        /* Make entire page and container full viewport on mobile */
+        @media (max-width: 600px) {
+
+            html,
+            body {
+                height: 100%;
+                margin: 0;
+                padding: 0;
+            }
+
+            body {
+                padding: 0;
+                justify-content: flex-start;
+            }
+
+            .container {
+                width: 100%;
+                height: 100vh;
+                padding: 20px !important;
+                border-radius: 0 !important;
+                box-shadow: none !important;
+                overflow-y: auto;
+                flex-grow: 1;
+                display: flex;
+                flex-direction: column;
+            }
+
+            /* Make sure form and buttons scale nicely */
+            form button {
+                font-size: 1.1rem !important;
+                padding: 14px 0 !important;
+            }
+
+            /* Requests list stacked vertically */
+            .request-item {
+                flex-direction: column !important;
+                align-items: flex-start !important;
+            }
+
+            .request-item>div:last-child {
+                margin-top: 12px !important;
+                width: 100% !important;
+                display: flex !important;
+                flex-wrap: wrap !important;
+                gap: 10px !important;
+                justify-content: flex-start !important;
+            }
+
+            /* Buttons full width or near full */
+            .btn {
+                flex: 1 1 45% !important;
+                min-width: auto !important;
+                margin-left: 0 !important;
+                padding: 12px 0 !important;
+                font-size: 1rem !important;
+            }
+
+            /* Pin input smaller */
+            #pinBlocks {
+                gap: 12px !important;
+                justify-content: center !important;
+            }
+
+            .pin-block {
+                width: 40px !important;
+                height: 50px !important;
+                font-size: 2rem !important;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="container">
+        <div class="first">
+            <h1>Request Money (UPI)</h1>
+
+            {% for message in messages %}
+            <div class="message {{ message.tags }}">{{ message }}</div>
+            {% endfor %}
+
+            <form method="POST" novalidate>
+                {% csrf_token %}
+                {{ form.non_field_errors }}
+                <label for="id_upi_id">{{ form.upi_id.label }}</label>
+                {{ form.upi_id }}
+
+                <label for="id_amount">{{ form.amount.label }}</label>
+                {{ form.amount }}
+
+                <label for="id_reason">{{ form.reason.label }}</label>
+                {{ form.reason }}
+
+                <button type="submit">Send Request</button>
+            </form>
+        </div>
+        <div class="second">
+            <hr style="margin: 40px 0;">
+
+            <h1>Money Requests Received</h1>
+
+            {% if pending_requests %}
+            {% for req in pending_requests %}
+            <div class="request-item">
+                <div class="request-info">
+                    <strong>{{ req.requester.username }}</strong> requested ₹{{ req.amount }}<br>
+                    <small>{{ req.reason|default:"No reason given" }}</small><br>
+                    <span class="status">Status: {{ req.status|capfirst }}</span>
+                </div>
+                <div>
+                    {% if req.status == 'pending' %}
+                    <button class="btn btn-approve"
+                        onclick="openPinModal('{{ req.id }}', '{{ req.amount }}', '{{ req.requester.username }}')">Approve</button>
+                    {% endif %}
+                    <a href="{% url 'handle_upi_request' req.id 'decline' %}">
+                        <button class="btn btn-decline">Decline</button>
+                    </a>
+                    {% if req.status == 'pending' %}
+                    <a href="{% url 'handle_upi_request' req.id 'later' %}">
+                        <button class="btn btn-later">Later</button>
+                    </a>
+                    {% endif %}
+                </div>
+            </div>
+            {% endfor %}
+            {% else %}
+            <p>No requests found.</p>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- UPI PIN Modal -->
+    <div class="modal-overlay" id="pinModal" aria-hidden="true">
+        <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+            <h2 id="modalTitle">Enter UPI PIN</h2>
+            <p id="modalText"></p>
+            <form id="pinForm" method="POST" novalidate>
+                {% csrf_token %}
+                <!-- Hidden combined PIN -->
+                <input type="hidden" name="upi_pin" id="upi_pin_hidden" />
+
+                <!-- 4 PIN blocks -->
+                <div id="pinBlocks">
+                    <input type="text" maxlength="1" inputmode="numeric" pattern="[0-9]" class="pin-block"
+                        autocomplete="off" />
+                    <input type="text" maxlength="1" inputmode="numeric" pattern="[0-9]" class="pin-block"
+                        autocomplete="off" />
+                    <input type="text" maxlength="1" inputmode="numeric" pattern="[0-9]" class="pin-block"
+                        autocomplete="off" />
+                    <input type="text" maxlength="1" inputmode="numeric" pattern="[0-9]" class="pin-block"
+                        autocomplete="off" />
+                </div>
+
+                <div>
+                    <button type="submit" class="btn btn-confirm">Confirm</button>
+                    <button type="button" class="btn btn-cancel" onclick="closePinModal()">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    <button id="themeToggle"
+        style="position: fixed; bottom: 20px; right: 20px; padding: 10px; border-radius: 8px; border:none; cursor:pointer;">
+        Toggle Light/Dark
+    </button>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const pinBlocks = document.querySelectorAll('.pin-block');
+            const hiddenInput = document.getElementById('upi_pin_hidden');
+
+            pinBlocks.forEach((input, idx) => {
+                input.addEventListener('input', (e) => {
+                    const val = e.target.value;
+                    if (!/^\d$/.test(val)) {
+                        e.target.value = '';
+                        return;
+                    }
+                    if (idx < pinBlocks.length - 1 && val) {
+                        pinBlocks[idx + 1].focus();
+                    }
+                    updateHidden();
+                });
+
+                input.addEventListener('keydown', (e) => {
+                    if (e.key === 'Backspace' && !e.target.value && idx > 0) {
+                        pinBlocks[idx - 1].focus();
+                    }
+                });
+            });
+
+            function updateHidden() {
+                let combined = '';
+                pinBlocks.forEach(block => combined += block.value);
+                hiddenInput.value = combined;
+            }
+
+            window.openPinModal = function (requestId, amount, username) {
+                const modal = document.getElementById('pinModal');
+                const form = document.getElementById('pinForm');
+                const modalText = document.getElementById('modalText');
+
+                modalText.innerHTML = `Approve ₹${amount} request from <strong>${username}</strong>`;
+                form.action = `/upi/handle/${requestId}/approve/`;
+                modal.style.display = 'flex';
+                modal.setAttribute('aria-hidden', 'false');
+
+                pinBlocks.forEach(input => input.value = '');
+                hiddenInput.value = '';
+                pinBlocks[0].focus();
+            };
+
+            window.closePinModal = function () {
+                const modal = document.getElementById('pinModal');
+                modal.style.display = 'none';
+                modal.setAttribute('aria-hidden', 'true');
+            };
+
+            // Close modal on outside click or ESC
+            window.addEventListener('click', e => {
+                const modal = document.getElementById('pinModal');
+                if (e.target === modal) closePinModal();
+            });
+
+            window.addEventListener('keydown', e => {
+                if (e.key === 'Escape') closePinModal();
+            });
+        });
+
+
+        const toggleBtn = document.getElementById('themeToggle');
+        toggleBtn.addEventListener('click', () => {
+            document.body.classList.toggle('light-mode');
+        });
+    </script>
+
+</body>
+
+</html>

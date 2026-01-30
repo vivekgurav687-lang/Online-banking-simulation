@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Register New User</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Rubik', sans-serif;
+      background: linear-gradient(135deg, #1f1c2c, #928dab);
+      color: #fff;
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+    }
+
+    .form-container {
+      background: rgba(255, 255, 255, 0.05);
+      backdrop-filter: blur(8px);
+      border-radius: 20px;
+      padding: 40px;
+      width: 100%;
+      max-width: 520px;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+    }
+
+    .form-group {
+      display: flex;
+      align-items: center;
+      margin-bottom: 25px;
+    }
+
+    .form-group label {
+      width: 150px;
+      text-align: right;
+      margin-right: 15px;
+      font-weight: 500;
+      font-size: 15px;
+      color: #f0f0f0;
+    }
+
+    .form-group input {
+      flex: 1;
+      padding: 10px 14px;
+      background-color: rgba(255, 255, 255, 0.1);
+      border: none;
+      border-radius: 8px;
+      color: white;
+      font-size: 15px;
+      transition: all 0.3s ease;
+    }
+
+    .form-group input:focus {
+      background-color: rgba(255, 255, 255, 0.15);
+      outline: none;
+      box-shadow: 0 0 0 2px #928dab;
+    }
+
+    button {
+      width: 100%;
+      padding: 12px;
+      background-color: #928dab;
+      border: none;
+      border-radius: 10px;
+      color: #1f1c2c;
+      font-weight: bold;
+      font-size: 16px;
+      cursor: pointer;
+      transition: 0.3s ease;
+    }
+
+    button:hover {
+      background-color: #b0a4cc;
+      transform: scale(1.02);
+    }
+
+    .form-container p {
+      margin: 15px 0;
+      text-align: center;
+      font-size: 14px;
+    }
+
+    .form-container button a {
+      color: inherit;
+      text-decoration: none;
+      display: block;
+    }
+
+    /* ✅ Responsive for small screens */
+    @media (max-width: 600px) {
+      .form-group {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+
+      .form-group label {
+        width: 100%;
+        text-align: left;
+        margin-bottom: 8px;
+      }
+      .form-group input{
+        width: 95%;
+      }
+
+      .form-container {
+        padding: 30px 20px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <form method="post" class="form-container">
+    {% csrf_token %}
+    <div class="form-group">
+      <label for="id_username">Username:</label>
+      {{ form.username }}
+    </div>
+    <div class="form-group">
+      <label for="id_email">Email:</label>
+      {{ form.email }}
+    </div>
+    <div class="form-group">
+      <label for="id_first_name">Full Name:</label>
+      {{ form.first_name }}
+    </div>
+    <div class="form-group">
+      <label for="id_password">Password:</label>
+      {{ form.password }}
+    </div>
+    <div class="form-group">
+      <label for="id_password2">Confirm Password:</label>
+      {{ form.password2 }}
+    </div>
+    <button type="submit">Register</button>
+    <p>- OR -</p>
+    <button type="button">
+      <a href="{% url 'login' %}">Login</a>
+    </button>
+  </form>
+</body>
+
+</html>

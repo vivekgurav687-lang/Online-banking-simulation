@@ -1,0 +1,371 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bill Payment</title>
+    <style>
+        /* ===== Global Reset ===== */
+        *,
+        *::before,
+        *::after {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1f1c2c, #928dab);
+            color: #fff;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 10px;
+        }
+
+        /* ===== Container ===== */
+        .bill-form {
+            background: rgba(255, 255, 255, 0.08);
+            backdrop-filter: blur(12px);
+            padding: 2rem;
+            border-radius: 16px;
+            width: 100%;
+            max-width: 420px;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+            animation: fadeIn 0.6s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        h2 {
+            text-align: center;
+            margin-bottom: 1.5rem;
+            font-weight: 600;
+            letter-spacing: 1px;
+        }
+
+        /* ===== Inputs & Select ===== */
+        select,
+        input,
+        button {
+            width: 100%;
+            padding: 12px 14px;
+            margin: 8px 0;
+            font-size: 15px;
+            border: none;
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.12);
+            color: #fff;
+            outline: none;
+            transition: all 0.3s ease;
+        }
+
+        select option {
+            background-color: #2e2e48;
+            /* dark dropdown menu */
+            color: #fff;
+            /* white text in dropdown */
+        }
+
+        select:focus {
+            outline: none;
+            background: rgba(255, 255, 255, 0.15);
+            /* slightly brighter when focused */
+            color: #fff;
+        }
+
+        input::placeholder {
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        select:focus,
+        input:focus {
+            background: rgba(255, 255, 255, 0.18);
+            box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.2);
+        }
+
+        /* ===== Buttons ===== */
+        button {
+            background-color:  #b3a1d8;
+            color: #fff;
+            font-weight: bold;
+            cursor: pointer;
+            letter-spacing: 0.5px;
+        }
+
+        button:hover {
+            background: linear-gradient(135deg, #b3a1d8, #6e57a0);
+            transform: scale(1.02);
+        }
+
+        /* ===== Overlay ===== */
+        .overlay {
+            position: fixed;
+            inset: 0;
+            background-color: rgba(0, 0, 0, 0.6);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            padding: 10px;
+        }
+
+        .overlay.active {
+            display: flex;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .overlay-content {
+            background-color: #2e2e48;
+            padding: 2rem;
+            border-radius: 12px;
+            text-align: center;
+            width: 100%;
+            max-width: 320px;
+            animation: scaleUp 0.3s ease;
+        }
+
+        @keyframes scaleUp {
+            from {
+                transform: scale(0.9);
+            }
+
+            to {
+                transform: scale(1);
+            }
+        }
+
+        .tpin-inputs {
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+            margin-top: 15px;
+        }
+
+        .tpin-inputs input {
+            width: 45px;
+            height: 55px;
+            text-align: center;
+            font-size: 20px;
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.12);
+            color: #fff;
+            border: none;
+        }
+
+        /* ===== PIN Buttons ===== */
+        .overlay-content button {
+            flex: 1;
+            padding: 10px;
+            border-radius: 8px;
+            font-weight: 500;
+        }
+
+        .btn-confirm {
+            background: linear-gradient(135deg, #4cafef, #3b83d4);
+            color: #fff;
+        }
+
+        .btn-confirm:hover {
+            background: linear-gradient(135deg, #6dc1ff, #4a90e2);
+        }
+
+        .btn-cancel {
+            background: #ff5e5e;
+            color: #fff;
+        }
+
+        .btn-cancel:hover {
+            background: #ff7676;
+        }
+
+        /* ===== Responsive ===== */
+        @media (max-width: 480px) {
+            .bill-form {
+                padding: 1.2rem;
+                border-radius: 12px;
+            }
+
+            h2 {
+                font-size: 1.4rem;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="bill-form">
+        <h2>Pay Utility Bill</h2>
+
+        <div id="messages">
+            {% for message in messages %}
+            <div class="message {% if message.tags %}{{ message.tags }}{% endif %}">{{ message }}</div>
+            {% endfor %}
+        </div>
+
+        <form id="billForm" method="POST" action="{% url 'demo_payment' %}">
+            {% csrf_token %}
+            <label>Bill Type:</label>
+            <select name="bill_type" id="bill_type" required>
+                <option value="Electricity">Electricity</option>
+                <option value="Water">Water</option>
+                <option value="Gas">Gas</option>
+            </select>
+
+            <label>Consumer Number:</label>
+            <input type="text" name="consumer_number" id="consumer_number" placeholder="e.g. CUST1001" required>
+
+            <label>Fetched Name:</label>
+            <input type="text" id="fetched_name" readonly placeholder="Name will appear here">
+
+            <label>Amount (₹):</label>
+            <input type="number" name="amount" id="amount" min="1" step="0.01" required>
+
+            <button type="button" id="openOverlay">Pay Bill</button>
+        </form>
+    </div>
+
+    <!-- Overlay -->
+    <div class="overlay" id="tpinOverlay">
+        <div class="overlay-content">
+            <h3>Enter T-PIN</h3>
+            <div class="tpin-inputs">
+                <input type="password" maxlength="1" class="pin-block" inputmode="numeric">
+                <input type="password" maxlength="1" class="pin-block" inputmode="numeric">
+                <input type="password" maxlength="1" class="pin-block" inputmode="numeric">
+                <input type="password" maxlength="1" class="pin-block" inputmode="numeric">
+            </div>
+            <div style="display:flex; gap:.5rem; margin-top:15px;">
+                <button class="btn-confirm" id="confirmPin">Confirm</button>
+                <button class="btn-cancel" id="cancelPin" type="button">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // CSRF helper for AJAX if needed later
+        function getCookie(name) {
+            let cookieValue = null;
+            if (document.cookie && document.cookie !== '') {
+                const cookies = document.cookie.split(';');
+                for (let i = 0; i < cookies.length; i++) {
+                    const cookie = cookies[i].trim();
+                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
+                    }
+                }
+            }
+            return cookieValue;
+        }
+
+        const consumerEl = document.getElementById('consumer_number');
+        const billTypeEl = document.getElementById('bill_type');
+        const fetchedNameEl = document.getElementById('fetched_name');
+        const amountEl = document.getElementById('amount');
+
+        // Trigger verification when consumer number loses focus
+        consumerEl.addEventListener('blur', verifyConsumer);
+        // also a button could trigger verifyConsumer()
+
+        function verifyConsumer() {
+            const consumer = consumerEl.value.trim();
+            const bill_type = billTypeEl.value;
+            if (!consumer) return;
+
+            fetch(`/verify-biller/?consumer_no=${encodeURIComponent(consumer)}&bill_type=${encodeURIComponent(bill_type)}`)
+                .then(resp => resp.json())
+                .then(data => {
+                    if (data.status === 'success') {
+                        fetchedNameEl.value = data.name || '';
+                        if (data.amount_due) amountEl.value = data.amount_due;
+                    } else {
+                        fetchedNameEl.value = '';
+                        // show friendly message
+                        alert(data.message || 'Consumer not found');
+                    }
+                })
+                .catch(err => {
+                    console.error(err);
+                    alert('Error fetching consumer info');
+                });
+        }
+
+        // Overlay & PIN behaviour
+        const overlay = document.getElementById('tpinOverlay');
+        const openOverlayBtn = document.getElementById('openOverlay');
+        const cancelPinBtn = document.getElementById('cancelPin');
+        const confirmPinBtn = document.getElementById('confirmPin');
+        const pinInputs = Array.from(document.querySelectorAll('.pin-block'));
+
+        openOverlayBtn.addEventListener('click', () => {
+            // basic front validation
+            if (!consumerEl.value.trim() || !amountEl.value) {
+                alert('Please enter consumer number and amount first.');
+                return;
+            }
+            overlay.classList.add('active');
+            pinInputs[0].focus();
+        });
+
+        cancelPinBtn.addEventListener('click', () => {
+            overlay.classList.remove('active');
+            pinInputs.forEach(i => i.value = '');
+        });
+
+        // auto move focus
+        pinInputs.forEach((input, idx) => {
+            input.addEventListener('input', () => {
+                if (input.value.length === 1 && idx < pinInputs.length - 1) pinInputs[idx + 1].focus();
+            });
+            input.addEventListener('keydown', (e) => {
+                if (e.key === 'Backspace' && !input.value && idx > 0) pinInputs[idx - 1].focus();
+            });
+        });
+
+        // On confirm, assemble TPIN, append to form and submit
+        confirmPinBtn.addEventListener('click', () => {
+            const tpin = pinInputs.map(i => i.value).join('');
+            if (tpin.length !== 4) {
+                alert('Enter 4 digit T-PIN');
+                return;
+            }
+            // append hidden inputs to form and submit (page reload submit)
+            const form = document.getElementById('billForm');
+
+            // Remove previous hidden inputs if any
+            document.querySelectorAll('input[name="tpin"], input[name="consumer_no"]').forEach(n => n.remove());
+
+            // add required hidden fields
+            const h1 = document.createElement('input');
+            h1.type = 'hidden'; h1.name = 'tpin'; h1.value = tpin; form.appendChild(h1);
+
+            // consumer number and amount are already in inputs; ensure names match backend
+            // our form uses name=consumer_number and name=amount, backend expects consumer_no and amount
+            // add consumer_no hidden to match view (or change backend to read consumer_number)
+            const h2 = document.createElement('input');
+            h2.type = 'hidden'; h2.name = 'consumer_no'; h2.value = consumerEl.value.trim(); form.appendChild(h2);
+
+            // bill_type and amount exist (bill_type name= bill_type, amount name=amount)
+            overlay.classList.remove('active');
+            form.submit();
+        });
+    </script>
+</body>
+
+</html>

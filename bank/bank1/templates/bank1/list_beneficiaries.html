@@ -1,0 +1,291 @@
+{% load static %}
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title>My Beneficiaries</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    html,
+    body {
+      height: 100%;
+      overflow: hidden;
+    }
+
+    body {
+      font-family: 'Rubik', sans-serif;
+      background: linear-gradient(135deg, #1f1c2c, #928dab);
+      color: #fff;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 20px;
+    }
+
+    h2 {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+
+    .beneficiaries-container {
+      display: flex;
+      align-items: center;
+      overflow-x: auto;
+      gap: 20px;
+      padding: 10px 0;
+    }
+
+    .beneficiary-card {
+      position: relative;
+      height: 180px;
+      width: 120px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+      border-radius: 20px;
+      background: rgba(255, 255, 255, 0.2);
+      backdrop-filter: blur(8px);
+      transition: background 0.3s ease;
+    }
+
+    .beneficiary-card:hover {
+      background: rgba(0, 0, 0, 0.3);
+    }
+
+    .avatar-circle {
+      width: 80px;
+      height: 80px;
+      border-radius: 50%;
+      overflow: hidden;
+      margin-bottom: 8px;
+    }
+
+    .avatar-circle img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .beneficiary-name {
+      font-size: 14px;
+    }
+
+    .hover-actions {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%) scale(0);
+      opacity: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 10px;
+      transition: all 0.3s ease;
+    }
+
+    .beneficiary-card:hover .hover-actions {
+      transform: translate(-50%, -50%) scale(1);
+      opacity: 1;
+    }
+
+    .beneficiary-card:hover .avatar-circle img,
+    .beneficiary-card:hover .beneficiary-name {
+      filter: blur(3px);
+      transition: filter 0.3s ease;
+      z-index: 0;
+    }
+
+    .beneficiary-card .hover-actions {
+      z-index: 1;
+    }
+
+    .hover-actions button {
+      padding: 6px 14px;
+      background: #b3a1d8;
+      height: 40px;
+      width: 70px;
+      color: white;
+      border: none;
+      border-radius: 10px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: transform 0.2s ease;
+    }
+
+    .hover-actions button:hover {
+      transform: scale(1.05);
+
+    }
+
+    .add-btn {
+      background-color: transparent;
+      border: none;
+      cursor: pointer;
+      width: 80px;
+      height: 80px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .add-btn img {
+      width: 60%;
+      filter: invert(1);
+    }
+
+    .overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: rgba(255, 255, 255, 0.15);
+      backdrop-filter: blur(8px);
+      display: none;
+      justify-content: center;
+      align-items: center;
+      z-index: 1000;
+    }
+
+    .overlay.active {
+      display: flex;
+    }
+
+    .form-modal.login-container {
+      background: rgba(255, 255, 255, 0.05);
+      backdrop-filter: blur(10px);
+      padding: 30px 25px;
+      border-radius: 20px;
+      width: 90%;
+      max-width: 400px;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+    }
+
+    .form-modal h2 {
+      text-align: center;
+      margin-bottom: 20px;
+      font-size: 24px;
+      color: #fff;
+    }
+
+    .form-modal input {
+      width: 100%;
+      padding: 12px;
+      margin-bottom: 16px;
+      border: none;
+      border-radius: 8px;
+      background: rgba(255, 255, 255, 0.1);
+      color: #fff;
+      font-size: 16px;
+    }
+
+    .form-modal input::placeholder {
+      color: #fff;
+      opacity: 0.7;
+    }
+
+    .form-modal button[type="submit"] {
+      width: 100%;
+      padding: 12px;
+      background-color: #928dab;
+      border: none;
+      border-radius: 10px;
+      color: #1f1c2c;
+      font-weight: bold;
+      font-size: 16px;
+      cursor: pointer;
+      transition: background-color 0.3s ease, transform 0.2s ease;
+    }
+
+    .form-modal button[type="submit"]:hover {
+      background-color: #b3a1d8;
+      transform: scale(1.02);
+    }
+
+    .form-modal .cancel-btn {
+      text-align: center;
+      margin-top: 10px;
+      cursor: pointer;
+      color: lightgray;
+      text-decoration: underline;
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="beneficiaries-container">
+    {% for b in beneficiaries %}
+    <div class="beneficiary-card">
+      <div class="avatar-circle">
+        <img class="avatar-img" data-name="{{ b.name }}" alt="{{ b.name }}">
+      </div>
+      <div class="beneficiary-name">{{ b.name }}</div>
+      <div class="hover-actions">
+        <button><a href="{% url 'edit_beneficiary' b.pk %}" style="text-decoration: none; color: white;">Edit</a></button>
+        <button><a href="{% url 'pay_beneficiary' b.pk %}" style="text-decoration: none; color: white;">Pay</a></button>
+      </div>
+    </div>
+    {% endfor %}
+
+    <div class="beneficiary-card" id="addCard">
+      <button class="add-btn" id="openFormBtn">
+        <img src="https://cdn-icons-png.flaticon.com/128/3524/3524388.png" alt="Add">
+      </button>
+    </div>
+  </div>
+
+  <!-- Overlay Modal -->
+  <div class="overlay" id="overlayForm">
+    <div class="form-modal login-container">
+      
+      <form method="post">
+        {% csrf_token %}
+        {{ form.name }}
+        {{ form.account_number }}
+        {{ form.ifsc_code }}
+        {{ form.upi_id }}
+        <button type="submit">Add Beneficiary</button>
+      </form>
+      <div class="cancel-btn" onclick="closeForm()">Cancel</div>
+    </div>
+  </div>
+
+  <script>
+    const overlay = document.getElementById("overlayForm");
+    const openBtn = document.getElementById("openFormBtn");
+    const addCard = document.getElementById("addCard");
+
+    openBtn.addEventListener("click", () => {
+      overlay.classList.add("active");
+      addCard.style.display = "none";
+    });
+
+    function closeForm() {
+      overlay.classList.remove("active");
+      addCard.style.display = "flex";
+    }
+
+    overlay.addEventListener("click", (e) => {
+      if (e.target === overlay) closeForm();
+    });
+
+    document.addEventListener("DOMContentLoaded", function () {
+      const avatars = document.querySelectorAll(".avatar-img");
+      avatars.forEach(img => {
+        const name = img.dataset.name || "";
+        const first = name.trim().charAt(0).toUpperCase() || "default";
+        img.src = `/static/letters/${first}.png`;
+      });
+    });
+  </script>
+</body>
+
+</html>

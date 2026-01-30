@@ -1,0 +1,420 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin</title>
+
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Rubik:wght@400;500&display=swap"
+    rel="stylesheet">
+
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      scroll-behavior: smooth;
+    }
+
+    body {
+      font-family: 'Rubik', sans-serif;
+      background: linear-gradient(135deg, #1f1c2c, #928dab);
+      color: #fff;
+      min-height: 100vh;
+      padding: 20px;
+      overflow-x: hidden;
+    }
+
+    header {
+      background: rgba(255, 255, 255, 0.05);
+      padding: 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+      margin-bottom: 20px;
+    }
+
+    header h4 {
+      font-size: 1rem;
+      /* font-family: 'Bebas Neue', cursive; */
+    }
+
+    .div {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 20px;
+      width: 100%;
+    }
+
+    .options {
+      height: 160px;
+      width: 100%;
+      max-width: 200px;
+      flex: 1 1 30%;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 12px;
+      padding: 20px 15px;
+      text-align: center;
+      transition: background 0.3s ease, transform 0.3s ease;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      font-family: "Bebas Neue", sans-serif;
+    }
+
+    .options img {
+      height: 90px;
+    }
+
+    .options p {
+      margin-top: 10%;
+      color: white;
+      font-size: 1.3rem;
+    }
+
+    .options:hover {
+      background: rgba(255, 255, 255, 0.15);
+      transform: translateY(-5px);
+      cursor: pointer;
+    }
+
+    .div1 {
+      height: 400px;
+      width: 40%;
+      margin-left: 30%;
+      margin-top: 1%;
+      display: flex;
+      /* justify-content: center;
+      align-items: center; */
+      flex-direction: column;
+      background: rgba(255, 255, 255, 0.06);
+      transition: background 0.3s ease, transform 0.3s ease;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      border-radius: 20px;
+    }
+
+    .div1 h2 {
+      text-align: center;
+      margin-top: 5%;
+    }
+
+   #message-container li{
+    position: fixed;
+    list-style: none;
+    top: 20px;
+    margin-left: 35%;
+    z-index: 9999;
+    background: rgba(15, 14, 14, 0.06);
+    color: white;
+    padding: 12px 20px;
+    border-radius: 6px;
+    font-weight: 500;
+    transition: opacity 0.5s ease-in-out;
+   }
+
+    /* User_List */
+  .table-container {
+    overflow-x: auto;
+    margin-top: 20px;
+    border-radius: 8px;
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    min-width: 60px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+    overflow: hidden;
+  }
+
+  th, td {
+    padding: 12px 16px;
+    text-align: left;
+    white-space: nowrap;
+  }
+
+  th {
+    color: #fff;
+    font-weight: 600;
+  }
+
+  h3 {
+    font-size: 28px;
+    color: #333;
+    margin-bottom: 16px;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  }
+
+  @media (max-width: 768px) {
+    th, td {
+      padding: 10px 12px;
+      font-size: 14px;
+    }
+
+    h3 {
+      font-size: 22px;
+    }
+  }
+
+     /* deposit */
+    .input-group {
+      width: 80%;
+      margin-left: 10%;
+      margin-top: 5%;
+      position: relative;
+      margin-bottom: 30px;
+    }
+
+    .input-group input {
+      width: 100%;
+      height: 50px;
+      padding: 16px 12px 6px;
+      border: none;
+      border-radius: 8px;
+      background: rgba(255, 255, 255, 0.1);
+      color: white;
+      font-size: 16px;
+      outline: none;
+    }
+
+    .input-group input::placeholder {
+      color: transparent;
+    }
+
+    .input-group label {
+      position: absolute;
+      top: 16px;
+      left: 12px;
+      color: #ccc;
+      font-size: 16px;
+      pointer-events: none;
+      transition: 0.2s ease all;
+    }
+
+
+    .input-group input:focus + label,
+    .input-group input:not(:placeholder-shown) + label {
+      top: -9px;
+      left: 10px;
+      font-size: 13px;
+      color: #2c2c54;
+      padding: 0 4px;
+      color: #fff;
+    }
+
+    .btn {
+      width: 50%;
+      padding: 17px;
+      margin-top: 5%;
+      margin-left: 25%;
+      background-color: #928dab;
+      border: none;
+      border-radius: 50px;
+      color: #1f1c2c;
+      font-weight: bold;
+      font-size: 16px;
+      cursor: pointer;
+      transition: background-color 0.3s ease, transform 0.2s ease;
+    }
+
+    .btn:hover {
+      background-color: #b3a1d8;
+      transform: scale(1.02);
+    }
+
+/* Add */
+.approval-grid {
+  width: 90%;
+  margin: auto;
+  display: flex;
+  flex-direction: column;
+  /* gap: 20px; */
+}
+
+.list {
+  display: grid;
+  grid-template-columns: 1fr 2fr 1fr; /* Username | Input | Button */
+  align-items: center;
+  /* background: rgba(255, 255, 255, 0.05); */
+  padding: 15px 20px;
+  border-radius: 10px;
+  gap: 20px;
+}
+
+.username {
+  color: white;
+  font-weight: bold;
+  font-size: 16px;
+}
+
+.input-group1 {
+  position: relative;
+  display: inline-block;
+  margin-right: 10px;
+  
+}
+
+.input-group1 input {
+  padding: 14px 10px 6px;
+  font-size: 14px;
+  border-radius: 6px;
+  border: none;
+  background: rgba(255, 255, 255, 0.1);
+  color: white;
+  outline: none;
+  width: 200px;
+}
+
+.input-group1 input::placeholder {
+  color: transparent;
+}
+
+.input-group1 label {
+  position: absolute;
+  top: 50%;
+  left: 10px;
+  transform: translateY(-50%);
+  font-size: 14px;
+  color: #ccc;
+  pointer-events: none;
+  transition: 0.2s ease all;
+}
+
+.input-group1 input:focus + label,
+.input-group1 input:not(:placeholder-shown) + label {
+  top: -1px;
+      left: 10px;
+      font-size: 13px;
+      color: #2c2c54;
+      padding: 0 4px;
+      color: #fff;
+}
+
+.inline-group1 {
+  vertical-align: middle;
+}
+
+.btn1 {
+      /* width: 50%; */
+      padding: 17px;
+      margin-top: 5%;
+      /* margin-left: 25%; */
+      background-color: #928dab;
+      border: none;
+      border-radius: 50px;
+      color: #1f1c2c;
+      font-weight: bold;
+      font-size: 16px;
+      cursor: pointer;
+      transition: background-color 0.3s ease, transform 0.2s ease;
+    }
+
+    .btn1:hover {
+      background-color: #b3a1d8;
+      transform: scale(1.02);
+    }
+
+
+    @media (max-width: 768px) {
+      .div {
+        flex-direction: column;
+        gap: 15px;
+        align-items: center;
+      }
+
+      .options {
+        max-width: 100%;
+        width: 90%;
+      }
+      header h4 {
+        width: 100%;
+        text-align: center;
+        margin-bottom: 10px;
+      }
+
+      .div1 {
+        padding: 10px;
+      }
+
+      .options {
+        max-width: 90%;
+        flex: 1 1 100%;
+      }
+
+      table {
+        min-width: 100%;
+        font-size: 14px;
+      }
+
+      h3 {
+        font-size: 20px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <header>
+    <h4>Dhanalaxmi Bank</h4>
+    <h4>Welcome! Admin</h4>
+  </header>
+{% if messages %}
+  <ul id="message-container">
+    {% for message in messages %}
+       <li>
+        {{ message }}
+      </li>
+    {% endfor %}
+  </ul>
+{% endif %}
+
+
+  <form method="post">
+    {% csrf_token %}
+    <div class="div">
+      <button type="submit" name="option" value="users" class="options">
+        <img src="https://cdn-icons-png.flaticon.com/128/6012/6012282.png" alt="">
+        <p>User List</p>
+      </button>
+
+      <button type="submit" name="option" value="deposit" class="options">
+        <img src="https://cdn-icons-png.flaticon.com/128/5566/5566941.png" alt="">
+        <p>Deposit Money</p>
+      </button>
+
+      <button type="submit" name="option" value="add" class="options">
+        <img src="https://cdn-icons-png.flaticon.com/128/11911/11911063.png" alt="">
+        <p>Add New Customer</p>
+      </button>
+    </div>
+
+    <div class="div1">
+      {% if selected == 'users' %}
+      {% include "bank1/list.html" %}
+      {% elif selected == 'deposit' %}
+      {% include "bank1/deposit.html" %}
+      {% elif selected == 'add' %}
+      {% include "bank1/add.html" %}
+      {% endif %}
+    </div>
+  </form>
+<script>
+   setTimeout(function () {
+    const msg = document.getElementById("message-container");
+    if (msg) {
+      msg.style.display = "none";
+    }
+  }, 1500);
+</script>
+</body>
+
+</html>

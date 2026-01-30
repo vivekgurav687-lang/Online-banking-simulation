@@ -1,0 +1,326 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>UPI Transfer</title>
+  <link href="https://fonts.googleapis.com/css2?family=Rubik&family=Inter&display=swap" rel="stylesheet">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Rubik', sans-serif;
+    }
+
+    body {
+      background: linear-gradient(135deg, #1f1c2c, #928dab);
+      color: #fff;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+
+    .transf {
+      background: rgba(255, 255, 255, 0.05);
+      padding: 30px;
+      border-radius: 16px;
+      box-shadow: 0 4px 30px rgba(0, 0, 0, 0.2);
+      text-align: center;
+      width: 100%;
+      max-width: 400px;
+    }
+
+    .avatar {
+      margin-left: 38%;
+    }
+
+    .transf h2 {
+      margin-bottom: 20px;
+    }
+
+    .transf input[type="text"],
+    .transf input[type="number"] {
+      width: 100%;
+      padding: 12px;
+      margin-bottom: 15px;
+      border: none;
+      border-radius: 8px;
+      font-size: 16px;
+    }
+
+    .transf button {
+      padding: 12px 20px;
+      background: #6C63FF;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-size: 16px;
+      cursor: pointer;
+      transition: background 0.3s ease;
+    }
+
+    .transf button:hover {
+      background: #5a52e0;
+    }
+
+    .avatar {
+      width: 80px;
+      height: 80px;
+      border-radius: 50%;
+      margin-bottom: 10px;
+    }
+
+    /* Overlay Modal */
+    .overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: rgba(0, 0, 0, 0.6);
+      display: none;
+      justify-content: center;
+      align-items: center;
+      z-index: 999;
+    }
+
+    .overlay.active {
+      display: flex;
+    }
+
+    .overlay-content {
+      background: linear-gradient(135deg, #1f1c2c, #928dab);
+      color: white;
+      padding: 30px;
+      border-radius: 16px;
+      text-align: center;
+      width: 90%;
+      max-width: 320px;
+    }
+
+    .tpin-inputs {
+      display: flex;
+      justify-content: space-between;
+      margin: 20px 0;
+    }
+
+    .tpin-inputs input {
+      width: 50px;
+      height: 50px;
+      font-size: 24px;
+      text-align: center;
+      border: 2px solid #ccc;
+      border-radius: 8px;
+    }
+
+    .close-btn {
+      margin-left: 10px;
+      background-color: #ccc;
+      color: #000;
+    }
+
+    #gpay-toast {
+      position: fixed;
+      bottom: 30px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: #000;
+      color: #fff;
+      padding: 12px 20px;
+      border-radius: 8px;
+      display: none;
+      z-index: 1000;
+    }
+
+    #gpay-toast.show-toast {
+      display: block;
+    }
+
+    .toast {
+      position: fixed;
+      top: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      background-color: #ff4d4d;
+      color: white;
+      padding: 12px 24px;
+      border-radius: 8px;
+      font-weight: bold;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s ease-in-out;
+      z-index: 1000;
+    }
+
+    .toast.show {
+      opacity: 1;
+    }
+
+    /* Common button styles */
+    button {
+      padding: 12px 20px;
+      border: none;
+      border-radius: 6px;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.3s ease, transform 0.2s;
+    }
+
+    /* Submit Button */
+    button[type="submit"] {
+      background: #28a745;
+      /* Green */
+      color: white;
+      margin-right: 10px;
+    }
+
+    button[type="submit"]:hover {
+      background: #218838;
+      transform: scale(1.02);
+    }
+
+    /* Cancel Button */
+    .close-btn {
+      background: #dc3545;
+      /* Red */
+      color: white;
+    }
+
+    .close-btn:hover {
+      background: #c82333;
+      transform: scale(1.02);
+    }
+  </style>
+</head>
+
+<body>
+  <div class="transf">
+    <img id="upi-avatar" class="avatar" src="" alt="Letter" style="display:none;">
+    <h2 id="upi-name"></h2>
+    <h2>UPI Transfer</h2>
+
+    <form id="mainForm" method="POST" action="{% url 'transfer' %}">
+      {% csrf_token %}
+      <input type="text" name="receiver_upi" id="upiId" placeholder="Enter UPI ID" required />
+      <input type="number" name="amount" id="amount" placeholder="Enter Amount" min="1" required />
+      <input type="hidden" name="pin" id="pinInput" />
+      <button type="button" onclick="showPinOverlay()">Proceed to Pay</button>
+    </form>
+  </div>
+
+  <!-- UPI PIN Overlay Modal -->
+  <div class="overlay" id="upiPinOverlay">
+    <div class="overlay-content">
+      <h3>Enter UPI PIN</h3>
+      <div class="tpin-inputs">
+        <input type="password" maxlength="1" required />
+        <input type="password" maxlength="1" required />
+        <input type="password" maxlength="1" required />
+        <input type="password" maxlength="1" required />
+      </div>
+      <div class="button-group">
+        <button type="button" onclick="submitPin()">Submit</button>
+        <button type="button" class="close-btn" onclick="closePinOverlay()">Cancel</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Notifications -->
+  <div id="toast" class="toast"></div>
+  <div id="gpay-toast">Payment Successful!</div>
+
+  <!-- Script -->
+  <script>
+    const upiInput = document.querySelector('input[name="receiver_upi"]');
+    const nameDisplay = document.getElementById('upi-name');
+    const avatarImg = document.getElementById('upi-avatar');
+
+    upiInput.addEventListener('blur', function () {
+      const upiId = upiInput.value.trim();
+
+      if (upiId.length >= 5) {
+        fetch(`/get_upi_name/?receiver_upi=${encodeURIComponent(upiId)}`)
+          .then(res => res.json())
+          .then(data => {
+            if (data.name) {
+              const firstLetter = data.name.charAt(0).toUpperCase();
+              nameDisplay.textContent = data.name;
+              avatarImg.src = `/static/letters/${firstLetter}.png`;
+              avatarImg.style.display = 'block';
+            } else {
+              nameDisplay.textContent = "⚠️ UPI not found";
+              avatarImg.style.display = 'none';
+            }
+          })
+          .catch(() => {
+            nameDisplay.textContent = "⚠️ Error fetching name";
+            avatarImg.style.display = 'none';
+          });
+      } else {
+        nameDisplay.textContent = "";
+        avatarImg.style.display = 'none';
+      }
+    });
+
+    function submitPin() {
+      const pinInputs = document.querySelectorAll('.tpin-inputs input');
+      let pin = '';
+      pinInputs.forEach(input => pin += input.value);
+
+      if (pin.length !== 4) {
+        showToast("Please enter your 4-digit UPI PIN.");
+        return;
+      }
+
+      document.getElementById('pinInput').value = pin;
+      closePinOverlay();
+      document.getElementById('mainForm').submit();
+    }
+
+    function closePinOverlay() {
+      document.getElementById('upiPinOverlay').classList.remove('active');
+    }
+
+    function showPinOverlay() {
+      document.getElementById('upiPinOverlay').classList.add('active');
+    }
+
+    // Auto focus between PIN boxes
+    document.querySelectorAll('.tpin-inputs input').forEach((input, index, inputs) => {
+      input.addEventListener('input', () => {
+        if (input.value.length === 1 && index < inputs.length - 1) {
+          inputs[index + 1].focus();
+        }
+      });
+
+      input.addEventListener('keydown', (e) => {
+        if (e.key === 'Backspace' && input.value === '' && index > 0) {
+          inputs[index - 1].focus();
+        }
+      });
+    });
+
+    function showToast(message) {
+      const toast = document.getElementById('toast');
+      toast.textContent = message;
+      toast.classList.add('show');
+      setTimeout(() => {
+        toast.classList.remove('show');
+      }, 1000);
+    }
+
+    {% if messages %}
+    window.addEventListener("DOMContentLoaded", () => {
+      {% for message in messages %}
+        showToast("{{ message|escapejs }}");
+      {% endfor %}
+    });
+    {% endif %}
+  </script>
+</body>
+</html>

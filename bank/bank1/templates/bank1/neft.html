@@ -1,0 +1,547 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>NEFT/IMPS Transfer</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      scroll-behavior: smooth;
+    }
+
+    body {
+      font-family: 'Rubik', sans-serif;
+      background: linear-gradient(135deg, #1f1c2c, #928dab);
+      color: #fff;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      height: 97.5vh;
+      padding: 10px;
+      height: 100vh;
+    }
+
+    .transf {
+      margin-top: 3%;
+      width: 35%;
+      min-width: 300px;
+      background: rgba(255, 255, 255, 0.05);
+      backdrop-filter: blur(10px);
+      padding: 2rem;
+      border-radius: 20px;
+    }
+
+    .avatar {
+      width: 80px;
+      height: 80px;
+      border-radius: 50%;
+      object-fit: cover;
+      display: block;
+      margin-left: 42%;
+    }
+
+    h2 {
+      margin-bottom: 20px;
+      text-align: center;
+      font-size: 2rem;
+      font-family: 'Inter';
+    }
+
+    input,
+    button {
+      padding: 12px;
+      margin: 8px 0;
+      width: 100%;
+      font-size: 16px;
+      border: none;
+      border-radius: 8px;
+      background: rgba(255, 255, 255, 0.1);
+      color: #fff;
+      box-sizing: border-box;
+    }
+
+    input::placeholder {
+      color: #fff;
+      opacity: 0.7;
+    }
+
+    button {
+      margin-top: 10px;
+      background-color: #928dab;
+      color: #1f1c2c;
+      font-weight: bold;
+      cursor: pointer;
+      transition: background-color 0.3s ease, transform 0.2s ease;
+    }
+
+    button:hover {
+      background-color: #b3a1d8;
+      transform: scale(1.02);
+    }
+
+    /* Slide Toggle */
+    .slide-toggle-container {
+      margin: 20px 0;
+      display: flex;
+      justify-content: center;
+    }
+
+    .slide-toggle {
+      position: relative;
+      display: flex;
+      width: 220px;
+      height: 45px;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 50px;
+      cursor: pointer;
+      overflow: hidden;
+    }
+
+    .slide-toggle .option {
+      flex: 1;
+      text-align: center;
+      line-height: 45px;
+      z-index: 2;
+      color: #fff;
+      font-weight: bold;
+      transition: color 0.3s ease;
+    }
+
+    .slide-toggle .option.active {
+      color: #1f1c2c;
+    }
+
+    .slide-toggle .slider {
+      position: absolute;
+      top: 2px;
+      bottom: 2px;
+      left: 2px;
+      width: 50%;
+      background: #928dab;
+      border-radius: 50px;
+      z-index: 1;
+      transition: all 0.3s ease;
+    }
+
+    #gpay-toast {
+      position: fixed;
+      bottom: 40px;
+      left: 50%;
+      transform: translateX(-50%) translateY(30px);
+      background-color: rgba(50, 50, 50, 0.9);
+      color: white;
+      padding: 12px 24px;
+      border-radius: 24px;
+      font-size: 15px;
+      font-weight: 500;
+      opacity: 0;
+      transition: all 0.4s ease;
+      z-index: 9999;
+      pointer-events: none;
+      box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
+    }
+
+
+    .show-toast {
+      opacity: 1 !important;
+      transform: translateX(-50%) translateY(0) !important;
+    }
+
+    .responsive-table-container {
+      width: 100%;
+      overflow-x: auto;
+      margin-top: 20px;
+    }
+
+    h3 {
+      font-size: 20px;
+      margin-top: 30px;
+      margin-bottom: 10px;
+      text-align: center;
+      color: #ffffff;
+    }
+
+    table {
+      width: 100%;
+      max-width: 600px;
+      margin: 0 auto;
+      border-collapse: collapse;
+      background: rgba(255, 255, 255, 0.05);
+      backdrop-filter: blur(5px);
+      border-radius: 10px;
+      overflow: hidden;
+      min-width: 400px;
+    }
+
+    thead {
+      background: rgba(255, 255, 255, 0.1);
+    }
+
+    th,
+    td {
+      padding: 12px 16px;
+      text-align: center;
+      color: #fff;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    tr:nth-child(even) {
+      background-color: rgba(255, 255, 255, 0.03);
+    }
+
+    th {
+      font-weight: 600;
+      font-family: 'Inter', sans-serif;
+      font-size: 15px;
+    }
+
+    td {
+      font-size: 14px;
+      font-family: 'Rubik', sans-serif;
+    }
+
+    .status-pending {
+      color: #ffdd57;
+    }
+
+    .status-completed {
+      color: #4BB543;
+    }
+
+    .overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background-color: rgba(0, 0, 0, 0.6);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 10000;
+      display: none;
+    }
+
+    .overlay.active {
+      display: flex;
+    }
+
+    .overlay-content {
+      background-color: #2e2e48;
+      padding: 2rem;
+      border-radius: 12px;
+      text-align: center;
+      width: 300px;
+    }
+
+    .tpin-inputs {
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      margin-top: 15px;
+    }
+
+    .tpin-inputs input {
+      width: 40px;
+      height: 50px;
+      text-align: center;
+      font-size: 24px;
+      border: none;
+      border-radius: 8px;
+      background: rgba(255, 255, 255, 0.1);
+      color: white;
+    }
+
+    .close-btn {
+      background-color: #ff5e5e;
+      margin-top: 15px;
+    }
+
+    /* 📱 Mobile responsive */
+    @media (max-width: 600px) {
+      .transf {
+        width: 100%;
+        padding: 20px;
+      }
+
+      .slide-toggle {
+        width: 100%;
+        height: 42px;
+      }
+
+      #gpay-toast {
+        font-size: 14px;
+        padding: 10px 20px;
+        bottom: 20px;
+      }
+
+      th,
+      td {
+        font-size: 13px;
+        padding: 10px;
+      }
+
+      table {
+        min-width: 350px;
+      }
+
+      h3 {
+        font-size: 18px;
+      }
+
+      .status-table th,
+      .status-table td {
+        font-size: 13px;
+        padding: 8px;
+      }
+
+    }
+  </style>
+</head>
+
+<body>
+  <div class="transf">
+    <img id="avatar" class="avatar" src="" alt="Letter" style="display:none;">
+    <h2 id="account-holder-name"></h2>
+
+    <form method="POST" id="transfer-form">
+      {% csrf_token %}
+      <input type="text" name="receiver_account_number" placeholder="Account Number" required>
+      <p id="account-holder-name" style="margin-top: 5px; font-size: 14px;"></p>
+      <input type="number" name="amount" placeholder="Amount" step="0.01" required>
+      <input type="hidden" name="method" id="transfer_method" value="NEFT" />
+
+      <div class="slide-toggle-container">
+        <div class="slide-toggle">
+          <div class="option active" data-method="neft">NEFT</div>
+          <div class="option" data-method="imps">IMPS</div>
+          <div class="slider"></div>
+        </div>
+      </div>
+
+      {% if not request.user.userprofile.tpin %}
+      <p style="color: yellow; font-size: 14px;">⚠️ You haven't set your T-PIN. <a href="#"
+          onclick="showTpinOverlay('set')" style="color: #fff; text-decoration: underline;">Set it now</a></p>
+      {% else %}
+      <button type="button" onclick="showTpinOverlay('enter')" id="submit-btn">Transfer via NEFT</button>
+      {% endif %}
+    </form>
+  </div>
+
+  {% if messages %}
+  <div id="gpay-toast" class="show-toast">
+    {% for message in messages %}
+    <span>{{ message }}</span>
+    {% endfor %}
+  </div>
+  {% endif %}
+
+  {% if neft_transactions %}
+  <h3>NEFT Transactions</h3>
+  <div class="responsive-table-container">
+    <table>
+      <thead>
+        <tr>
+          <th>To</th>
+          <th>Amount</th>
+          <th>Scheduled Time</th>
+          <th>Status</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for tx in neft_transactions %}
+        <tr>
+          <td>{{ tx.receiver.get_full_name|default:tx.receiver.username }}</td>
+          <td>₹{{ tx.amount }}</td>
+          <td>{{ tx.scheduled_time|default:"—" }}</td>
+          <td>
+            <span class="status status-{{ tx.status }}">
+              {{ tx.status|title }}
+            </span>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% endif %}
+
+  <!-- Overlays -->
+  <div class="overlay" id="set-tpin-overlay">
+    <div class="overlay-content">
+      <h3>Set your T-PIN</h3>
+      <form method="POST" action="{% url 'set_tpin' %}">
+        {% csrf_token %}
+        <input type="password" name="tpin1" placeholder="Enter T-PIN" required>
+        <input type="password" name="tpin2" placeholder="Confirm T-PIN" required>
+        <button type="submit">Set T-PIN</button>
+        <button type="button" class="close-btn" onclick="closeOverlays()">Cancel</button>
+      </form>
+    </div>
+  </div>
+
+<div class="overlay" id="enter-tpin-overlay">
+  <div class="overlay-content">
+    <h3>Enter T-PIN</h3>
+    <div class="tpin-inputs">
+      <input type="password" maxlength="1" class="tpin-digit" inputmode="numeric">
+      <input type="password" maxlength="1" class="tpin-digit" inputmode="numeric">
+      <input type="password" maxlength="1" class="tpin-digit" inputmode="numeric">
+      <input type="password" maxlength="1" class="tpin-digit" inputmode="numeric">
+    </div>
+    <button type="button" class="close-btn" onclick="closeOverlays()">Cancel</button>
+  </div>
+</div>
+
+  <script>
+    function showTpinOverlay(type) {
+      document.getElementById('set-tpin-overlay').classList.remove('active');
+      document.getElementById('enter-tpin-overlay').classList.remove('active');
+
+      if (type === 'set') {
+        document.getElementById('set-tpin-overlay').classList.add('active');
+      } else {
+        document.getElementById('enter-tpin-overlay').classList.add('active');
+      }
+    }
+
+    function closeOverlays() {
+      document.querySelectorAll('.overlay').forEach(el => el.classList.remove('active'));
+    }
+
+    function submitWithTpin() {
+      const digits = Array.from(document.querySelectorAll('#enter-tpin-overlay input'))
+        .map(input => input.value).join('');
+
+      const hidden = document.createElement('input');
+      hidden.type = 'hidden';
+      hidden.name = 'pin';
+      hidden.value = digits;
+      document.getElementById('transfer-form').appendChild(hidden);
+      document.getElementById('transfer-form').submit();
+    }
+
+    // Transfer method toggle
+    document.addEventListener("DOMContentLoaded", function () {
+      const toggle = document.querySelector(".slide-toggle");
+      const options = toggle.querySelectorAll(".option");
+      const slider = toggle.querySelector(".slider");
+      const hiddenInput = document.getElementById("transfer_method");
+      const submitBtn = document.getElementById("submit-btn");
+
+      options.forEach((option, index) => {
+        option.addEventListener("click", () => {
+          options.forEach(opt => opt.classList.remove("active"));
+          option.classList.add("active");
+
+          slider.style.left = index === 0 ? "2px" : "calc(50% + 2px)";
+          hiddenInput.value = option.dataset.method.toUpperCase();
+          submitBtn.textContent = `Transfer via ${option.dataset.method.toUpperCase()}`;
+        });
+      });
+
+      const toast = document.getElementById('gpay-toast');
+      if (toast) {
+        setTimeout(() => {
+          toast.classList.remove('show-toast');
+          setTimeout(() => toast.remove(), 400);
+        }, 5000);
+      }
+    });
+
+    // Auto detect name
+    document.addEventListener('DOMContentLoaded', function () {
+      const accountInput = document.querySelector('input[name="receiver_account_number"]');
+      const nameDisplay = document.getElementById('account-holder-name');
+      const avatarDiv = document.getElementById('avatar');
+
+      accountInput.addEventListener('blur', function () {
+        const accNum = accountInput.value.trim();
+
+        if (accNum.length >= 5) {
+          fetch(`/get_account_name/?account_number=${accNum}`)
+            .then(res => res.json())
+            .then(data => {
+              if (data.name) {
+                const firstLetter = data.name.charAt(0).toUpperCase();
+                nameDisplay.textContent = data.name;
+                avatarDiv.src = `/static/letters/${firstLetter}.png`;
+                avatarDiv.style.display = 'inline-block';
+              } else {
+                nameDisplay.textContent = "⚠️ Account not found";
+                avatarDiv.style.display = 'none';
+              }
+            })
+            .catch(() => {
+              nameDisplay.textContent = "⚠️ Error fetching name";
+              avatarDiv.style.display = 'none';
+            });
+        } else {
+          nameDisplay.textContent = "";
+          avatarDiv.style.display = 'none';
+        }
+      });
+    });
+
+
+    // Auto move between T-PIN digits
+    document.addEventListener("DOMContentLoaded", function () {
+      const tpinInputs = document.querySelectorAll("#enter-tpin-overlay .tpin-digit");
+
+      tpinInputs.forEach((input, index) => {
+        input.addEventListener("input", () => {
+          if (input.value.length === 1 && index < tpinInputs.length - 1) {
+            tpinInputs[index + 1].focus();
+          }
+        });
+
+        input.addEventListener("keydown", (e) => {
+          if (e.key === "Backspace" && input.value === '' && index > 0) {
+            tpinInputs[index - 1].focus();
+          }
+        });
+      });
+    });
+
+    document.addEventListener("DOMContentLoaded", function () {
+  const tpinInputs = document.querySelectorAll("#enter-tpin-overlay .tpin-digit");
+
+  tpinInputs.forEach((input, index) => {
+    input.addEventListener("input", () => {
+      // Move to next input
+      if (input.value.length === 1 && index < tpinInputs.length - 1) {
+        tpinInputs[index + 1].focus();
+      }
+
+      // If all inputs are filled, auto-submit
+      const allFilled = Array.from(tpinInputs).every(inp => inp.value.length === 1);
+      if (allFilled) {
+        const digits = Array.from(tpinInputs).map(i => i.value).join('');
+        const hidden = document.createElement('input');
+        hidden.type = 'hidden';
+        hidden.name = 'pin';
+        hidden.value = digits;
+        document.getElementById('transfer-form').appendChild(hidden);
+        document.getElementById('transfer-form').submit();
+      }
+    });
+
+    // Backspace to go to previous
+    input.addEventListener("keydown", (e) => {
+      if (e.key === "Backspace" && input.value === '' && index > 0) {
+        tpinInputs[index - 1].focus();
+      }
+    });
+  });
+});
+
+  </script>
+</body>
+
+</html>

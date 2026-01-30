@@ -1,0 +1,1311 @@
+{% load static %}
+{% load humanize %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Banking Dashboard</title>
+  <link href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;600&display=swap" rel="stylesheet">
+  <!-- <link rel="stylesheet" href="{% static 'bank.css' %}"> -->
+  <style>
+    /*
+  * This is the corrected and updated CSS code with a light theme.
+  * It introduces CSS variables for both themes and a new `body.light-mode` class
+  * to handle the color changes.
+*/
+
+    :root {
+      /* Dark Mode Variables */
+      --dark-bg: linear-gradient(135deg, #1f1c2c, #928dab);
+      --dark-text: #fff;
+      --dark-glass-bg: rgba(255, 255, 255, 0.2);
+      --dark-header-bg: rgba(255, 255, 255, 0.05);
+      --dark-icon-bg: rgba(255, 255, 255, 0.06);
+      --dark-icon-border: rgba(255, 255, 255, 0.12);
+      --dark-h2-color: #d1cbe6;
+      --dark-box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+      --dark-button-bg: #00c853;
+      --dark-button-hover: #00b347;
+
+      /* Light Mode Variables */
+      --light-bg: #f4f7f9;
+      --light-text: #333;
+      --light-glass-bg: rgba(255, 255, 255, 0.7);
+      --light-header-bg: rgba(255, 255, 255, 0.9);
+      --light-icon-bg: rgba(230, 230, 230, 0.8);
+      --light-icon-border: rgba(200, 200, 200, 0.8);
+      --light-h2-color: #555;
+      --light-box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+      --light-button-bg: #4caf50;
+      --light-button-hover: #3e8e41;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      scroll-behavior: smooth;
+    }
+
+
+    .set {
+      display: flex;
+      border-radius: 10px;
+      background: var(--dark-glass-bg);
+      backdrop-filter: blur(10px);
+      color: var(--dark-text);
+      height: 30px;
+      padding: 7px;
+    }
+
+    .set a {
+      color: var(--dark-text);
+      text-decoration: none;
+      margin-left: 10px;
+    }
+
+    .set a:hover {
+      color: blue;
+    }
+
+    .set a img {
+      height: 10px;
+    }
+
+    @import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&display=swap');
+    @import url('https://fonts.googleapis.com/css2?family=Rubik:wght@400;500;600&display=swap');
+
+    .bebas-neue-regular {
+      font-family: "Bebas Neue", sans-serif;
+      font-weight: 400;
+      font-style: normal;
+    }
+
+    body {
+      font-family: 'Rubik', sans-serif;
+      background: var(--dark-bg);
+      color: var(--dark-text);
+      min-height: 100vh;
+      justify-content: center;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 20px;
+      overflow-x: hidden;
+      transition: background 0.5s ease, color 0.5s ease;
+    }
+
+    /* Light Mode Styles */
+    body.light-mode {
+      background: var(--light-bg);
+      color: var(--light-text);
+    }
+
+    body.light-mode .set {
+      background: var(--light-glass-bg);
+      color: var(--light-text);
+    }
+
+    body.light-mode .set a {
+      color: var(--light-text);
+    }
+
+    body.light-mode .set a:hover {
+      color: blue;
+    }
+
+    header {
+      background: var(--dark-header-bg);
+      padding: 20px;
+      display: flex;
+      width: 100%;
+      align-items: center;
+      box-shadow: var(--dark-box-shadow);
+      position: relative;
+      margin-bottom: 10px;
+      transition: background 0.5s ease, box-shadow 0.5s ease;
+    }
+
+    body.light-mode header {
+      background: var(--light-header-bg);
+      color: var(--light-text);
+      box-shadow: var(--light-box-shadow);
+    }
+
+    header h4 {
+      font-size: 1rem;
+      margin-right: auto;
+    }
+
+    .search-wrapper {
+      position: relative;
+      display: flex;
+      align-items: center;
+      border-radius: 30px;
+      transition: width 0.3s ease;
+      margin-right: 20px;
+    }
+
+    .search-input {
+      width: 0;
+      opacity: 0;
+      border: none;
+      outline: none;
+      padding: 8px;
+      border-radius: 30px;
+      background: var(--dark-icon-bg);
+      color: var(--dark-text);
+      transition: width 0.3s ease, opacity 0.3s ease;
+    }
+
+    body.light-mode .search-input {
+      background: var(--light-icon-bg);
+      color: var(--light-text);
+    }
+
+    .search-wrapper.active .search-input {
+      width: 200px;
+      opacity: 1;
+    }
+
+    .search-button {
+      cursor: pointer;
+      width: 24px;
+      height: 24px;
+      margin-left: 10px;
+      transition: transform 0.2s;
+    }
+
+    .search-button:hover {
+      transform: scale(1.1);
+    }
+
+    .user-info {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      cursor: pointer;
+    }
+
+    .user-info img {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      border: 2px solid var(--dark-text);
+      transition: border-color 0.5s ease;
+    }
+
+    body.light-mode .user-info img {
+      border: 2px solid var(--light-text);
+    }
+
+    /*notification*/
+    .notification-wrapper {
+      position: relative;
+      display: inline-block;
+      right: 10px;
+    }
+
+    .notification-count {
+      position: absolute;
+      top: -5px;
+      right: 5px;
+      background-color: red;
+      color: white;
+      font-size: 12px;
+      padding: 1px 5px;
+      border-radius: 50%;
+    }
+
+    .dropdown-menu1,
+    #notification-dropdown {
+      display: none;
+      position: absolute;
+      background: var(--dark-glass-bg);
+      backdrop-filter: blur(10px);
+      color: var(--dark-text);
+      min-width: 220px;
+      top: 40px;
+      right: 70px;
+      z-index: 1000;
+      padding: 10px;
+      box-shadow: var(--dark-box-shadow);
+      border-radius: 6px;
+      transition: background 0.5s ease, color 0.5s ease, box-shadow 0.5s ease;
+    }
+
+    body.light-mode .dropdown-menu1,
+    body.light-mode #notification-dropdown {
+      background: var(--light-glass-bg);
+      color: var(--light-text);
+      box-shadow: var(--light-box-shadow);
+    }
+
+    .dropdown-item {
+      padding: 6px;
+      /* border-bottom: 1px solid #444; */
+    }
+
+    .dropdown-item:last-child {
+      border-bottom: none;
+    }
+
+    #notification-dropdown {
+      right: 0;
+      min-width: 250px;
+    }
+
+    #notification-dropdown.show {
+      display: block !important;
+    }
+
+    .dropdown-item {
+      padding: 8px;
+    }
+
+    .dropdown-item:last-child {
+      border-bottom: none;
+    }
+
+    .pending-requests {
+      margin-top: 1.5rem;
+      width: 100%;
+      margin-left: auto;
+      margin-right: auto;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      padding: 10px 20px;
+      border-radius: 20px;
+      background: rgba(255, 255, 255, 0.6);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      height: auto;
+    }
+
+
+    .pending-requests h3 {
+      font-weight: 600;
+      color: white;
+      margin-bottom: 1rem;
+      border-bottom: 2px solid #e2e8f0;
+      padding-bottom: 0.5rem;
+    }
+
+    .pending-requests .request-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background-color: #f8fafc;
+      border: 1px solid #cbd5e1;
+      padding: 0.75rem 1rem;
+      margin-bottom: 0.75rem;
+      border-radius: 0.5rem;
+      transition: background-color 0.3s ease;
+      flex-wrap: wrap;
+      /* allow wrap on small screens */
+    }
+
+    .pending-requests .request-item:hover {
+      background-color: #e2e8f0;
+    }
+
+    .pending-requests strong {
+      font-weight: 700;
+      color: white;
+      font-size: 25px;
+      font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
+    }
+
+    .pending-requests .text-success {
+      color: #22c55e;
+      font-weight: 700;
+      font-size: 25px;
+      margin-left: 0.5rem;
+    }
+
+    .pending-requests small.text-muted {
+      color: #64748b;
+      margin-left: 0.5rem;
+      font-style: italic;
+    }
+
+    .pending-requests a.btn {
+      display: inline-block;
+      padding: 0.35rem 0.75rem;
+      font-size: 0.85rem;
+      font-weight: 600;
+      border-radius: 0.375rem;
+      text-decoration: none;
+      transition: background-color 0.2s ease, color 0.2s ease;
+      margin-left: 0.5rem;
+      user-select: none;
+      margin-top: 0.5rem;
+      white-space: nowrap;
+    }
+
+    .pending-requests a.btn-success {
+      background-color: #22c55e;
+      color: white;
+      border: none;
+    }
+
+    .pending-requests a.btn-success:hover {
+      background-color: #16a34a;
+    }
+
+    .pending-requests a.btn-danger {
+      background-color: #ef4444;
+      color: white;
+      border: none;
+    }
+
+    .pending-requests a.btn-danger:hover {
+      background-color: #b91c1c;
+    }
+
+    .pending-requests a.btn-warning {
+      background-color: #facc15;
+      color: #1e293b;
+      border: none;
+    }
+
+    .pending-requests a.btn-warning:hover {
+      background-color: #ca8a04;
+    }
+
+    .upi {
+      display: flex;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      /* allow wrapping */
+      gap: 10px;
+      /* spacing between wrapped items */
+    }
+
+    .pending-requests h3,
+    .pending-requests strong,
+    .pending-requests .text-success {
+      color: var(--dark-text);
+      transition: color 0.5s ease;
+    }
+
+    body.light-mode .pending-requests h3,
+    body.light-mode .pending-requests strong,
+    body.light-mode .pending-requests .text-success {
+      color: var(--light-text);
+    }
+
+
+    /* Responsive adjustments */
+    @media (max-width: 600px) {
+      .pending-requests .request-item {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+
+      .pending-requests .request-item>div:first-child {
+        margin-bottom: 0.75rem;
+      }
+
+      .pending-requests a.btn {
+        margin-left: 0;
+        margin-right: 0.5rem;
+        margin-top: 0;
+      }
+
+      .pending-requests .request-actions {
+        width: 100%;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+      }
+
+      .upi {
+        flex-direction: column;
+        /* stack items */
+        align-items: flex-start;
+      }
+
+    }
+
+
+    .section {
+      margin-bottom: 30px;
+      border-radius: 12px;
+      width: 100%;
+      padding: 20px;
+      opacity: 0;
+      transform: translateY(40px);
+      transition: all 0.6s ease-out;
+    }
+
+    .section.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .section h2 {
+      margin-bottom: 16px;
+      font-size: 1.4rem;
+      color: var(--dark-h2-color);
+      transition: color 0.5s ease;
+    }
+
+    body.light-mode .section h2 {
+      color: var(--light-h2-color);
+    }
+
+    .icon-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 16px;
+      padding-left: 0;
+      list-style: none;
+    }
+
+    .icon-list li {
+      flex: 1 1 180px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background: var(--dark-icon-bg);
+      border: 1px solid var(--dark-icon-border);
+      border-radius: 12px;
+      padding: 20px 15px;
+      transition: background 0.3s ease, transform 0.3s ease, border-color 0.5s ease;
+      text-align: center;
+    }
+
+    body.light-mode .icon-list li {
+      background: var(--light-icon-bg);
+      border: 1px solid var(--light-icon-border);
+    }
+
+    .icon-list li:hover {
+      background: rgba(255, 255, 255, 0.12);
+      /* This needs to be dynamic as well */
+      transform: scale(1.05);
+    }
+
+    .icon-list li a {
+      text-decoration: none;
+      color: var(--dark-text);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      transition: color 0.5s ease;
+    }
+
+    body.light-mode .icon-list li a {
+      color: var(--light-text);
+    }
+
+    .icon-list li img {
+      width: 40px;
+      height: 40px;
+      margin-bottom: 10px;
+    }
+
+    .icon-list li span {
+      font-size: 0.9rem;
+      font-weight: 500;
+    }
+
+    .dropdown-menu {
+      position: absolute;
+      top: 70px;
+      right: 0;
+      background: var(--dark-glass-bg);
+      backdrop-filter: blur(10px);
+      color: var(--dark-text);
+      padding: 10px;
+      border-radius: 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      opacity: 0;
+      pointer-events: none;
+      transform: translateY(-10px);
+      box-shadow: var(--dark-box-shadow);
+      transition: all 0.3s ease;
+      z-index: 10;
+    }
+
+    body.light-mode .dropdown-menu {
+      background: var(--light-glass-bg);
+      color: var(--light-text);
+      box-shadow: var(--light-box-shadow);
+    }
+
+    .dropdown-menu.show {
+      opacity: 1;
+      pointer-events: auto;
+      transform: translateY(0);
+    }
+
+    .dropdown-item {
+      opacity: 0;
+      transform: translateX(30px);
+      transition: all 0.3s ease;
+      cursor: pointer;
+    }
+
+    .dropdown-menu.show .dropdown-item.animate {
+      animation: slideInRight 0.4s ease forwards;
+    }
+
+    @keyframes slideInRight {
+      to {
+        opacity: 1;
+        transform: translateX(0);
+      }
+    }
+
+    .dropdown-item:hover {
+      transform: scale(1.05) translateX(0);
+    }
+
+    .account-overview {
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.4s ease, padding 0.3s ease;
+      padding: 0;
+    }
+
+    /* Dropdown Container */
+    #dropdown {
+      position: absolute;
+      top: 100%;
+      right: 0;
+      background-color: #2c2f33;
+      border-radius: 10px;
+      overflow: hidden;
+      max-width: 250px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.4);
+      display: none;
+      z-index: 1000;
+    }
+
+    #dropdown.show {
+      display: block;
+    }
+
+    /* Each Dropdown Item */
+    .dropdown-item {
+      padding: 12px 16px;
+      cursor: pointer;
+      color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      transition: background-color 0.2s ease;
+    }
+
+    .dropdown-item:last-child {
+      border-bottom: none;
+    }
+
+    .dropdown-item:hover {
+      background-color: #3a3d42;
+    }
+
+    /* Arrow Icon */
+    .arrow-icon {
+      width: 16px;
+      height: 16px;
+      margin-left: 10px;
+      transition: transform 0.3s ease;
+    }
+
+    /* Account Overview section (initially hidden) */
+    #overview-details {
+      display: none;
+      padding: 12px 16px;
+      color: #fff;
+      animation: fadeIn 0.3s ease forwards;
+    }
+
+    #overview-details.open {
+      display: block;
+    }
+
+    /* Smooth fade-in animation */
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(-8px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .account-overview.open {
+      max-height: 300px;
+      padding: 10px;
+    }
+
+    #overview-details p {
+      color: var(--dark-text);
+      font-size: small;
+      transition: color 0.5s ease;
+    }
+
+    body.light-mode #overview-details p {
+      color: var(--dark-text);
+    }
+
+    /* COMMON STYLES */
+    #dropdown.dropdown-menu {
+      padding: 10px;
+      border-radius: 8px;
+    }
+
+    .user-name {
+      height: 40px;
+      margin-top: 10px;
+      font-size: 25px;
+    }
+
+    .dropdown-item.drp {
+      display: block;
+      padding: 14px 20px;
+      /* Top-bottom spacing */
+      color: #fff;
+      text-decoration: none;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      transition: background-color 0.2s ease;
+      font-size: 15px;
+      line-height: 1.6;
+    }
+
+    .overview-text {
+      margin: 0;
+    }
+
+    .arrow-icon {
+      width: 14px;
+      margin-left: 8px;
+      vertical-align: middle;
+    }
+
+    .account-overview {
+      padding: 5px 0 10px 0;
+      display: none;
+      /* Toggle via JS */
+    }
+
+    /* DARK THEME */
+    body.dark-theme #dropdown.dropdown-menu {
+      background-color: #222;
+    }
+
+    body.dark-theme .user-name,
+    body.dark-theme .dropdown-item.drp,
+    body.dark-theme .account-overview,
+    body.dark-theme .overview-text {
+      color: white;
+      border-bottom: 1px solid white;
+    }
+
+    /* LIGHT THEME */
+    body.light-theme #dropdown.dropdown-menu {
+      background-color: #f0f0f0;
+    }
+
+    body.light-theme .user-name,
+    body.light-theme .dropdown-item.drp,
+    body.light-theme .account-overview,
+    body.light-theme .overview-text {
+      color: #111;
+      border-bottom: 1px solid #ccc;
+    }
+
+
+    .dropdown-menu.show .dropdown-item.animate:nth-child(1) {
+      animation-delay: 0.1s;
+    }
+
+    .dropdown-menu.show .dropdown-item.animate:nth-child(2) {
+      animation-delay: 0.2s;
+    }
+
+    .dropdown-menu.show .dropdown-item.animate:nth-child(3) {
+      animation-delay: 0.3s;
+    }
+
+    .dropdown-menu.show .dropdown-item.animate:nth-child(4) {
+      animation-delay: 0.4s;
+    }
+
+    .dropdown-menu.show .dropdown-item.animate:nth-child(5) {
+      animation-delay: 0.5s;
+    }
+
+    .overview-toggle {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      cursor: pointer;
+    }
+
+    .overview-toggle .arrow {
+      display: inline-block;
+      transition: transform 0.3s ease;
+    }
+
+    .welcome-container {
+      background: var(--dark-glass-bg);
+      border-radius: 20px;
+      padding: 40px 30px;
+      backdrop-filter: blur(10px);
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+      text-align: center;
+      max-width: 360px;
+      width: 90%;
+      transition: background 0.5s ease, color 0.5s ease, box-shadow 0.5s ease;
+    }
+
+    body.light-mode .welcome-container {
+      background: var(--light-glass-bg);
+      color: var(--light-text);
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+    }
+
+    .welcome-container h1 {
+      font-size: 32px;
+      margin-bottom: 10px;
+    }
+
+    .welcome-container p {
+      font-size: 18px;
+      margin-bottom: 30px;
+    }
+
+    a.btn {
+      display: block;
+      padding: 12px;
+      margin-bottom: 15px;
+      border-radius: 10px;
+      font-weight: 600;
+      text-decoration: none;
+      transition: 0.3s ease;
+    }
+
+    .btn-register {
+      background-color: var(--dark-button-bg);
+      color: white;
+    }
+
+    .btn-register:hover {
+      background-color: var(--dark-button-hover);
+    }
+
+    body.light-mode .btn-register {
+      background-color: var(--light-button-bg);
+      color: white;
+    }
+
+    body.light-mode .btn-register:hover {
+      background-color: var(--light-button-hover);
+    }
+
+    .btn-login {
+      background-color: #ffffff;
+      color: #1e3a8a;
+    }
+
+    .btn-login:hover {
+      background-color: #e0e0e0;
+    }
+
+    /* MOBILE & TABLET*/
+    .icon-list {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 16px;
+    }
+
+    .icon-list li {
+      flex: 0 0 160px;
+      background-color: var(--dark-icon-bg);
+      border-radius: 12px;
+      padding: 12px;
+      text-align: center;
+      color: var(--dark-text);
+      font-size: 0.9rem;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    body.light-mode .icon-list li {
+      background-color: var(--light-icon-bg);
+      color: var(--light-text);
+    }
+
+    .icon-list img {
+      width: 36px;
+      height: 36px;
+      margin-bottom: 8px;
+    }
+
+    .scroll-wrapper {
+      overflow-x: auto;
+      scroll-snap-type: x mandatory;
+      -webkit-overflow-scrolling: touch;
+      max-width: 100vw;
+    }
+
+    .scroll-wrapper::-webkit-scrollbar {
+      display: none;
+    }
+
+    /* ✅ Responsive adjustments */
+    @media (max-width: 600px) {
+
+      html,
+      body {
+        overflow-x: hidden;
+      }
+
+      header {
+        width: 100%;
+      }
+
+      .section {
+        margin-left: 0;
+        margin-right: 0;
+        margin-bottom: 0;
+        padding: 16px 10px;
+        background: none;
+      }
+
+      .icon-list {
+        flex-wrap: nowrap;
+        overflow-x: auto;
+        gap: 10px;
+        padding: 10px 0;
+        scroll-snap-type: x mandatory;
+        -webkit-overflow-scrolling: touch;
+      }
+
+      .icon-list li {
+        flex: 0 0 auto;
+        width: 90px;
+        height: 100px;
+        font-size: 12px;
+        word-break: break-word;
+        padding: 8px;
+        scroll-snap-align: start;
+      }
+
+      .icon-list li img {
+        width: 28px;
+        height: 28px;
+        margin-bottom: 6px;
+      }
+
+      header {
+        padding: 10px 15px;
+        margin: 0;
+      }
+
+      h1 {
+        font-size: 0.8rem;
+      }
+
+      .welcome-container {
+        margin-left: 7%;
+        margin-top: 70%;
+      }
+
+      .welcome-container h1 {
+        font-size: 1.5rem;
+      }
+
+      .welcome-container p,
+      a.btn {
+        font-size: 0.95rem;
+      }
+
+      a.btn {
+        padding: 10px;
+      }
+
+      .search-wrapper {
+        position: absolute;
+        top: 10px;
+        right: 50px;
+      }
+
+      .search-input {
+        right: 0;
+        top: -10px;
+        width: 0;
+        opacity: 0;
+      }
+
+      .search-wrapper.active .search-input {
+        width: 215px;
+        max-width: 300px;
+        right: 0;
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+        /* for Safari */
+      }
+    }
+  </style>
+</head>
+
+<body>
+  {% if request.user.is_authenticated %}
+  <header>
+    <h4>Dhanalaxmi Bank</h4>
+
+    <!-- search icon -->
+    <div class="search-wrapper" id="searchWrapper">
+      <input type="text" class="search-input" placeholder="Search..." />
+      <img src="{% static 'icons8-search-50.png' %}" alt="Search" class="search-button" onclick="toggleSearch(event)" />
+    </div>
+
+    <!-- Notifications icon -->
+    <div class="notification-wrapper">
+      <img id="notification-bell" src="https://cdn-icons-png.flaticon.com/128/10445/10445638.png" alt="Notifications"
+        style="width: 24px; cursor: pointer;">
+
+      {% if notifications %}
+      <span class="notification-count">{{ notifications|length }}</span>
+      {% endif %}
+
+      <div id="notification-dropdown" class="dropdown-menu1">
+        {% if notifications %}
+        {% for notify in notifications %}
+        <div class="dropdown-item">
+          <p style="margin: 0; font-size: 14px;">{{ notify.message }}</p>
+          <small style="color: gray;">{{ notify.created_at|date:"M d, H:i" }}</small>
+        </div>
+        {% endfor %}
+        {% else %}
+        <div class="dropdown-item">No notifications</div>
+        {% endif %}
+      </div>
+    </div>
+
+
+
+
+    <!-- user icon -->
+    <div class="user-info" onclick="toggleDropdown()">
+      <img
+        src="https://www.citypng.com/public/uploads/preview/profile-user-round-white-icon-symbol-png-701751695033499brrbuebohc.png"
+        alt="User Icon" />
+    </div>
+
+    <div id="dropdown" class="dropdown-menu">
+      <p class="dropdown-item name bebas-neue-regular user-name">{{ request.user.first_name }} {{ request.user.last_name}}</p>
+
+      <div class="dropdown-item overview-toggle" onclick="toggleOverview(event)">
+        <span class="overview-text">Account Overview</span>
+        <img id="arrow-icon-img" src="https://cdn-icons-png.flaticon.com/128/8213/8213476.png"
+          data-down="https://cdn-icons-png.flaticon.com/128/8213/8213476.png" data-up="{% static 'down-chevron.png' %}"
+          class="arrow-icon" alt="Toggle Arrow">
+      </div>
+
+      <div id="overview-details" class="account-overview">
+        <p>Account Number: {{ user.userprofile.account_number }}</p>
+        <p>Account Type: Savings</p>
+        <p>Account Balance: {{ user.userprofile.balance }}</p>
+        <p>UPI ID: {{ upi_id }}</p>
+      </div>
+
+      <a class="dropdown-item drp" href="{% url 'edit_upi_pin' %}">Change UPI pin</a>
+      <a class="dropdown-item drp" href="{% url 'edit_tpin' %}">Change TPIN</a>
+      <a class="dropdown-item drp" href="#" onclick="toggleTheme()">Settings</a>
+      <a class="dropdown-item drp" href="{% url 'logout' %}">Logout</a>
+    </div>
+  </header>
+
+  {% if request.user.is_authenticated %}
+  {% if not request.user.userprofile.upi_id %}
+  <div class="set">
+    <p>You have not set your UPI ID.</p>
+    <a href="{% url 'set_upi' %}">Set Now</a>
+    <a href="#"><img src="https://cdn-icons-png.flaticon.com/128/458/458595.png" alt=""></a>
+  </div>
+  {% endif %}
+  {% endif %}
+
+  {% if pending_requests %}
+  <div class="pending-requests mt-4">
+    <h3>Pending Money Requests</h3>
+
+    {% for req in pending_requests %}
+    <div class="d-flex justify-content-between align-items-center border p-2 mb-2 rounded bg-light">
+
+      <!-- Left side: requester info -->
+      <div class="upi">
+        <div>
+          <strong>{{ req.requester.username }}</strong>
+          <span class="text-success">₹{{ req.amount }}</span>
+          {% if req.reason %}
+          <small class="text-muted"> — {{ req.reason }}</small>
+          {% endif %}
+        </div>
+
+        <!-- Right side: buttons -->
+        <div class="right">
+          <a href="{% url 'handle_upi_request' req.id 'approve' %}" class="btn btn-success btn-sm">Approve</a>
+          <a href="{% url 'handle_upi_request' req.id 'decline' %}" class="btn btn-danger btn-sm">Decline</a>
+          <a href="{% url 'handle_upi_request' req.id 'later' %}" class="btn btn-warning btn-sm">Later</a>
+        </div>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+  {% endif %}
+
+  <div class="section">
+    <h2> Fund Transfers</h2>
+    <div class="scroll-wrapper">
+      <ul class="icon-list">
+        <li><img src="https://cdn-icons-png.flaticon.com/128/2879/2879357.png"> Self Transfer</li>
+        <li><img src="https://cdn-icons-png.flaticon.com/128/3080/3080541.png"><a href="{% url 'transfer' %}">UPI/</a><a
+            href="{% url 'bank_transfer' %}">NEFT / IMPS</a></li>
+        <li><a href="{% url 'beneficiary_dashboard' %}"><img
+              src="https://cdn-icons-png.flaticon.com/128/9405/9405882.png">Quick Transfer</a></li>
+        <li><a href="{% url 'schedule_transfer' %}"><img src="https://cdn-icons-png.flaticon.com/128/17323/17323924.png"
+              alt="Scheduled Transfer Icon">Scheduled
+            Transfers</a></li>
+        <li><img src="https://cdn-icons-png.flaticon.com/128/7961/7961069.png" alt="Transfer History Icon">Transfer
+          History</li>
+        <li><img src="https://cdn-icons-png.flaticon.com/128/1990/1990568.png" alt="Bulk Transfer Icon">Bulk Transfers
+        </li>
+        <li><a href="{% url 'request_money_upi' %}"><img src="https://cdn-icons-png.flaticon.com/128/10349/10349144.png"
+              alt="Request Money Icon">Request
+            Money(UPI) </a></li>
+        <li><img src="https://cdn-icons-png.flaticon.com/128/7268/7268609.png" alt="International Icon">Download
+          Transfer Receipt</li>
+        <li><img src="https://cdn-icons-png.flaticon.com/128/5404/5404957.png" alt="International Icon"> International
+          Transfers </li>
+        <li><a href="{% url 'statement' %}"><img src="https://cdn-icons-png.flaticon.com/128/7268/7268609.png">Download
+            Statement</a></li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="section">
+    <h2>Bill Payments & Recharge</h2>
+    <ul class="icon-list">
+      <li><a href="{%  url 'demo_payment' %}"><img src="https://cdn-icons-png.flaticon.com/128/8581/8581183.png"> Pay E/W/G Bills</a></li>
+      <li><a href="{% url 'recharge_demo' %}"><img src="https://cdn-icons-png.flaticon.com/128/3659/3659912.png"> Mobile/DTH Recharge</a></li>
+      <li><a href="{% url 'fastag_home' %}"><img src="https://cdn-icons-png.flaticon.com/128/2297/2297476.png"> FASTag Recharge</a></li>
+      <li><a href="{% url 'metro_home' %}"><img src="https://cdn-icons-png.flaticon.com/128/6435/6435414.png"> Metro Card Top-up</a></li>
+      <li><a href="{% url 'credit_card_bill_payment' %}"><img src="https://cdn-icons-png.flaticon.com/128/7026/7026587.png">Credit Card Bill Payment</a></li>
+      <li><img src="https://cdn-icons-png.flaticon.com/128/3337/3337100.png">Broadband / Landline Bills</li>
+      <li><img src="https://cdn-icons-png.flaticon.com/128/15512/15512495.png" alt="Loan Icon">Loan EMI Payments</li>
+      <li><img src="https://cdn-icons-png.flaticon.com/128/15511/15511021.png" alt="Subscription Icon">OTT / App
+        Subscriptions</li>
+    </ul>
+  </div>
+
+  <div class="section">
+    <h2>📈 Investments</h2>
+    <ul class="icon-list">
+      <li><a href="{% url 'calculator' %}"><img src="https://cdn-icons-png.flaticon.com/128/16468/16468856.png"> Open FD/RD</a></li>
+      <li><img src="https://cdn-icons-png.flaticon.com/128/1170/1170609.png"> Mutual Funds / SIPs</li>
+      <li><img src="https://cdn-icons-png.flaticon.com/128/2209/2209673.png"> Life & Health Insurance</li>
+      <li><img src="https://cdn-icons-png.flaticon.com/128/9084/9084248.png"> Demat & Trading</li>
+      <li><img src="https://cdn-icons-png.flaticon.com/128/5699/5699560.png" alt="Gold Icon">Digital Gold / Silver</li>
+      <li><img src="https://cdn-icons-png.flaticon.com/128/16942/16942711.png" alt="Tax Saver">Tax Saving Investments
+      </li>
+      <li><img src="https://cdn-icons-png.flaticon.com/128/4256/4256791.png" alt="Portfolio">View Investment Portfolio
+      </li>
+      <li><img src="https://cdn-icons-png.flaticon.com/128/10963/10963637.png" alt="Investment Plan Icon"
+          id="a">Investment Recommendations</li>
+    </ul>
+  </div>
+
+  <div class="section">
+    <h2>🔧 Card Services</h2>
+    <ul class="icon-list">
+      <li><img src="https://cdn-icons-png.flaticon.com/128/8983/8983163.png"> View / Block Cards</li>
+      <li><img src="https://cdn-icons-png.flaticon.com/128/1732/1732697.png"> Set Spending Limits</li>
+      <li><img src="https://cdn-icons-png.flaticon.com/128/14975/14975981.png"> Apply for Virtual Cards</li>
+      <li><img
+          src="data:image/jpeg;base64,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"
+          alt="Change PIN">Change ATM PIN</li>
+      <li><img src="https://cdn-icons-png.flaticon.com/128/11532/11532262.png">Track Card Delivery</li>
+      <li><img src="https://cdn-icons-png.flaticon.com/128/16205/16205384.png" alt="Freeze Card">Temporarily Freeze Card
+      </li>
+      <li><img src="https://cdn-icons-png.flaticon.com/128/6007/6007736.png" width="20" alt="Contactless">Enable /
+        Disable Contactless Payments</li>
+      <li><img
+          src="data:image/jpeg;base64,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"
+          width="20" alt="Replacement">Request Card Replacement</li>
+    </ul>
+  </div>
+
+  <div class="section">
+    <h2>🏦 Loan Services</h2>
+    <ul class="icon-list">
+      <li><img src="https://cdn-icons-png.flaticon.com/128/14597/14597231.png"> Apply for Loans</li>
+      <li><img src="https://cdn-icons-png.flaticon.com/128/16432/16432150.png"> EMI Schedule</li>
+      <li><img
+          src="data:image/png;base64,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">
+        Foreclosure</li>
+      <li><img src="https://cdn-icons-png.flaticon.com/128/3258/3258504.png"> Instant Offers</li>
+      <li><img src="https://cdn-icons-png.flaticon.com/128/1721/1721929.png">Check Loan Status</li>
+      <li><img src="https://cdn-icons-png.flaticon.com/128/781/781831.png">EMI Calculator</li>
+    </ul>
+  </div>
+
+  <div class="section">
+    <h2>👩‍💼 Customer Support</h2>
+    <ul class="icon-list">
+      <li><img src="https://cdn-icons-png.flaticon.com/128/1581/1581881.png"> Chat Support</li>
+      <li><img src="https://cdn-icons-png.flaticon.com/128/929/929416.png"> Raise Complaints</li>
+      <li><img src="https://cdn-icons-png.flaticon.com/128/3248/3248881.png"> Message Center</li>
+      <li><img src="https://cdn-icons-png.flaticon.com/128/992/992700.png"> FAQs</li>
+    </ul>
+  </div>
+
+  <div class="section">
+    <h2>🔒 Security Features</h2>
+    <ul class="icon-list">
+      <li><img src="https://cdn-icons-png.flaticon.com/128/3524/3524659.png"> Two-Factor Authentication</li>
+      <li><img src="https://cdn-icons-png.flaticon.com/128/709/709496.png"> Login Alerts</li>
+      <li><img src="https://cdn-icons-png.flaticon.com/128/1570/1570887.png"> App Usage Limits</li>
+      <li><img src="https://cdn-icons-png.flaticon.com/128/2421/2421042.png"> Cardless Withdrawals</li>
+    </ul>
+  </div>
+
+
+  {% else %}
+  <div class="welcome-container">
+    <h1>Welcome</h1>
+    <p>To Dhanalaxmi Bank</p>
+    <a href="{% url 'create' %}" class="btn btn-register">Register New User</a>
+    <a href="{% url 'login' %}" class="btn btn-login">Existing User</a>
+  </div>
+  {% endif %}
+
+
+  <script>
+    // Dropdown toggle
+    function toggleDropdown() {
+      const dropdown = document.getElementById("dropdown");
+      dropdown.classList.toggle("show");
+
+      const items = dropdown.querySelectorAll(".dropdown-item");
+      if (dropdown.classList.contains("show")) {
+        items.forEach((item) => {
+          item.classList.remove("animate");
+          void item.offsetWidth;
+          item.classList.add("animate");
+        });
+      } else {
+        items.forEach((item) => item.classList.remove("animate"));
+      }
+    }
+
+    // Account Overview toggle
+    function toggleOverview(event) {
+      event.stopPropagation(); // prevent dropdown close
+      const overview = document.getElementById("overview-details");
+      const arrowImg = document.getElementById("arrow-icon-img");
+      const upIcon = arrowImg.dataset.up;
+      const downIcon = arrowImg.dataset.down;
+
+      overview.classList.toggle("open");
+      arrowImg.src = overview.classList.contains("open") ? upIcon : downIcon;
+    }
+
+    // Close dropdown when clicking outside
+    document.addEventListener("click", function (e) {
+      const dropdown = document.getElementById("dropdown");
+      const userInfo = document.querySelector(".user-info");
+      if (!dropdown.contains(e.target) && !userInfo.contains(e.target)) {
+        dropdown.classList.remove("show");
+      }
+    });
+
+    // Search toggle
+    const searchWrapper = document.getElementById("searchWrapper");
+
+    function toggleSearch(e) {
+      e.stopPropagation();
+      searchWrapper.classList.toggle("active");
+    }
+
+    document.addEventListener("click", function (e) {
+      if (!searchWrapper.contains(e.target)) {
+        searchWrapper.classList.remove("active");
+      }
+    });
+
+    //Notification Script//
+    document.addEventListener("DOMContentLoaded", function () {
+      const bell = document.getElementById("notification-bell");
+      const dropdown = document.getElementById("notification-dropdown");
+
+      bell.addEventListener("click", function (event) {
+        event.stopPropagation();
+        dropdown.classList.toggle("show");
+      });
+
+      document.addEventListener("click", function (event) {
+        if (!dropdown.contains(event.target) && !bell.contains(event.target)) {
+          dropdown.classList.remove("show");
+        }
+      });
+    });
+
+    // Section reveal on scroll
+    function revealSections() {
+      const sections = document.querySelectorAll('.section');
+      const windowHeight = window.innerHeight;
+      sections.forEach(section => {
+        const sectionTop = section.getBoundingClientRect().top;
+        if (sectionTop < windowHeight - 100) {
+          section.classList.add('visible');
+        }
+      });
+    }
+
+    window.addEventListener('scroll', revealSections);
+    window.addEventListener('load', revealSections);
+
+    // change theme
+    // Check for saved theme preference on page load
+    document.addEventListener('DOMContentLoaded', () => {
+      const savedTheme = localStorage.getItem('theme');
+
+      if (savedTheme === 'light-mode') {
+        document.body.classList.add('light-mode');
+      } else {
+        // Default to dark-mode (or remove any applied light mode)
+        document.body.classList.remove('light-mode');
+      }
+    });
+
+    // Toggle and save theme
+    function toggleTheme() {
+      const body = document.body;
+      const isLightMode = body.classList.toggle('light-mode');
+
+      // Save the current theme
+      localStorage.setItem('theme', isLightMode ? 'light-mode' : 'dark-mode');
+    }
+
+  </script>
+</body>
+
+</html>

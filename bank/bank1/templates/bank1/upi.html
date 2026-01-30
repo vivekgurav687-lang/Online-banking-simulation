@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Responsive Payment Form</title>
+    <link href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;600&display=swap" rel="stylesheet" />
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: 'Rubik', sans-serif;
+            background: linear-gradient(135deg, #1f1c2c, #928dab);
+            color: white;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+        }
+
+        .container {
+            background: rgba(255, 255, 255, 0.12);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            padding: 30px;
+            width: 90%;
+            max-width: 600px;
+            border-radius: 16px;
+            box-shadow: 0 12px 28px rgba(0, 0, 0, 0.4);
+        }
+
+
+
+        h1 {
+            text-align: center;
+            margin-bottom: 25px;
+            color: #e0dbf5;
+        }
+
+        .method-selector {
+            display: flex;
+            justify-content: space-around;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 10px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+
+        .method-selector label {
+            flex: 1;
+            text-align: center;
+            padding: 8px;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+
+        .method-selector input[type="radio"] {
+            display: none;
+        }
+
+        .method-selector input[type="radio"]:checked+label {
+            background: rgba(255, 255, 255, 0.3);
+            font-weight: bold;
+        }
+
+        .form-section {
+            display: none;
+            animation: fadeIn 0.3s ease-in-out;
+        }
+
+        .form-section.active {
+            display: block;
+        }
+
+        input[type="text"],
+        input[type="number"] {
+            width: 100%;
+            padding: 10px;
+            margin-top: 6px;
+            margin-bottom: 16px;
+            border-radius: 6px;
+            border: none;
+            font-size: 1rem;
+            background: rgba(255, 255, 255, 0.15);
+            color: white;
+            backdrop-filter: blur(4px);
+        }
+
+        input::placeholder {
+            color: #ddd;
+            font-style: italic;
+        }
+
+        input[readonly] {
+            background-color: rgba(255, 255, 255, 0.08);
+            color: #ccc;
+            font-style: italic;
+        }
+
+        .submit-btn {
+            width: 100%;
+            padding: 12px;
+            background: #fff;
+            color: #222;
+            border: none;
+            border-radius: 6px;
+            font-weight: bold;
+            margin-top: 10px;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+
+        @media (max-width: 768px) {z
+            body {
+                padding: 0;
+                margin: 0;
+                overflow: hidden;
+                overflow: hidden;
+                touch-action: none;
+                background: linear-gradient(135deg, #1f1c2c, #1f1c2c); ;
+            }
+
+            .container {
+                background: none;
+                padding: 10px;
+                margin: 0;
+                border-radius: 0;
+                box-shadow: none;
+                /* height: 100vh; */
+                display: flex;
+                flex-direction: column;
+                justify-content: flex-start;
+            }
+
+            h1 {
+                font-size: 1.4rem;
+                margin-bottom: 10px;
+                text-align: center;
+            }
+
+            .method-selector {
+                display: flex;
+                /* flex-direction: column; */
+                gap: 12px;
+                margin-bottom: 20px;
+                padding: 10 10px;
+            }
+
+            .method-selector input[type="radio"] {
+                display: none;
+            }
+
+            .method-selector label {
+                background: rgba(255, 255, 255, 0.12);
+                padding: 16px;
+                border-radius: 10px;
+                text-align: center;
+                font-weight: bold;
+                cursor: pointer;
+                color: white;
+                font-size: 1rem;
+                transition: background 0.3s ease;
+            }
+
+            .method-selector input[type="radio"]:checked+label {
+                background: rgba(255, 255, 255, 0.25);
+            }
+
+
+            .form-section {
+                background: rgba(255, 255, 255, 0.05);
+                margin-top: 10%;
+                padding: 20px;
+                border-radius: 12px;
+                width: 100%;
+                height: 100%;
+                flex-grow: 1;
+                overflow-y: auto;
+            }
+
+            input[type="text"],
+            input[type="number"] {
+                width: 100%;
+                height: 50px;
+                font-size: 1rem;
+                padding: 10px;
+                margin-top: 16px;
+                border-radius: 8px;
+                border: none;
+            }
+
+            .submit-btn {
+                width: 100%;
+                height: 50px;
+                margin-top: 24px;
+                font-size: 1rem;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1>Select Payment Method</h1>
+
+        <div class="method-selector">
+            <input type="radio" id="upi" name="method" value="upi" checked onclick="showForm('upi')" />
+            <label for="upi">UPI</label>
+
+            <input type="radio" id="neft" name="method" value="neft" onclick="showForm('neft')" />
+            <label for="neft">NEFT</label>
+
+            <input type="radio" id="imps" name="method" value="imps" onclick="showForm('imps')" />
+            <label for="imps">IMPS</label>
+        </div>
+
+        <!-- UPI Form -->
+        <div class="form-section active" id="form-upi">
+            <input type="text" id="upiId" placeholder="Enter UPI ID (e.g. example@okicici)" onblur="fetchUPIBank()" />
+            <input type="text" id="upiBank" placeholder="Detected Bank Name" readonly />
+            <input type="number" placeholder="Enter amount" />
+            <button class="submit-btn">Pay via UPI</button>
+        </div>
+
+        <!-- NEFT Form -->
+        <div class="form-section" id="form-neft">
+            <input type="text" placeholder="Account Number" />
+            <input type="text" id="neftIfsc" placeholder="Enter IFSC Code" onblur="fetchIFSCBank()" />
+            <input type="text" id="neftBank" placeholder="Detected Bank Name" readonly />
+            <input type="number" placeholder="Amount" />
+            <button class="submit-btn">Transfer via NEFT</button>
+        </div>
+
+        <!-- IMPS Form -->
+        <div class="form-section" id="form-imps">
+            <input type="text" placeholder="Mobile Number" />
+            <input type="text" placeholder="MMID" />
+            <input type="number" placeholder="Amount" />
+            <button class="submit-btn">Pay via IMPS</button>
+        </div>
+    </div>
+
+    <script>
+        function showForm(method) {
+            document.querySelectorAll('.form-section').forEach(section => {
+                section.classList.remove('active');
+            });
+            document.getElementById(`form-${method}`).classList.add('active');
+        }
+
+        async function fetchIFSCBank() {
+            const ifsc = document.getElementById('neftIfsc').value.trim().toUpperCase();
+            const bankField = document.getElementById('neftBank');
+            if (!ifsc) return;
+            try {
+                const res = await fetch(`https://ifsc.razorpay.com/${ifsc}`);
+                if (!res.ok) throw new Error("Invalid IFSC");
+                const data = await res.json();
+                bankField.value = data.BANK;
+            } catch (err) {
+                bankField.value = "Invalid IFSC code";
+            }
+        }
+
+        function fetchUPIBank() {
+            const upiId = document.getElementById('upiId').value.trim();
+            const bankField = document.getElementById('upiBank');
+            const suffixToBank = {
+                'oksbi': 'State Bank of India',
+                'okhdfcbank': 'HDFC Bank',
+                'okicici': 'ICICI Bank',
+                'okaxis': 'Axis Bank',
+                'okyesbank': 'Yes Bank',
+                'ybl': 'PhonePe / Yes Bank',
+                'paytm': 'Paytm Payments Bank',
+                'ibl': 'IndusInd Bank',
+                'upi': 'NPCI / Default',
+                'axl': 'Axis Bank',
+                'oksb': 'State Bank of India'
+            };
+
+            const suffix = upiId.split('@')[1]?.toLowerCase();
+            if (suffix && suffixToBank[suffix]) {
+                bankField.value = suffixToBank[suffix];
+            } else {
+                bankField.value = 'Unknown or unsupported UPI handle';
+            }
+        }
+    </script>
+</body>
+
+</html>

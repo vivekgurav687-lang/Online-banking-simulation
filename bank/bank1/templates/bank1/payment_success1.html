@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Payment Successful</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: 'Rubik', sans-serif;
+      background: linear-gradient(135deg, #1f1c2c, #928dab);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      color: white;
+    }
+
+    .success-container {
+      text-align: center;
+      background: rgba(255, 255, 255, 0.1);
+      padding: 40px;
+      border-radius: 20px;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+      animation: slideUp 0.7s ease-out;
+    }
+
+    @keyframes slideUp {
+      from {
+        opacity: 0;
+        transform: translateY(30px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .checkmark {
+      width: 80px;
+      height: 80px;
+      border-radius: 50%;
+      background-color: #4CAF50;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 20px auto;
+      animation: pop 0.5s ease-in-out;
+    }
+
+    .checkmark:after {
+      content: '✓';
+      color: white;
+      font-size: 40px;
+    }
+
+    @keyframes pop {
+      0% {
+        transform: scale(0);
+      }
+      100% {
+        transform: scale(1);
+      }
+    }
+
+    .title {
+      font-size: 32px;
+      margin-bottom: 10px;
+    }
+
+    .label-paid {
+      font-size: 15px;
+      margin-top: 20px;
+      opacity: 0.8;
+    }
+
+    .amount {
+      font-size: 40px;
+      font-weight: bold;
+      margin: 10px 0 10px;
+    }
+
+    .method {
+      font-size: 14px;
+      opacity: 0.8;
+      margin-bottom: 10px;
+    }
+
+    .paid-to {
+      font-size: 22px;
+      margin: 10px 0;
+      opacity: 0.9;
+    }
+
+    .timestamp {
+      font-size: 16px;
+      opacity: 0.7;
+      margin-bottom: 30px;
+    }
+
+    .actions {
+      display: flex;
+      justify-content: center;
+      gap: 20px;
+    }
+
+    .btn {
+      background-color: #ffffff22;
+      border: 1px solid white;
+      padding: 10px 20px;
+      border-radius: 8px;
+      color: white;
+      text-decoration: none;
+      font-weight: bold;
+      transition: background 0.3s;
+    }
+
+    .btn:hover {
+      background-color: #ffffff44;
+    }
+
+        @media (max-width: 400px) {
+      .amount {
+        font-size: 24px;
+      }
+      .title {
+        font-size: 24px;
+      }
+      .paid-to {
+        font-size: 20px;
+      }
+      .method {
+        font-size: 16px;
+      }
+      .timestamp {
+        font-size: 14px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="success-container">
+    <div class="checkmark"></div>
+    <div class="title">Payment Successful</div>
+    <div class="label-paid">Paid</div>
+    <div class="amount">₹{{ amount }}</div>
+    <div class="method">via {{ method }}</div>
+    <div class="paid-to">to {{ name }}</div>
+    <div class="timestamp">{{ timestamp|date:"d M Y, h:i A" }}</div>
+    <div class="actions">
+      <a href="{% url 'beneficiary_dashboard' %}" class="btn">Done</a>
+      <a href="#" class="btn">Share Screenshot</a>
+    </div>
+  </div>
+</body>
+</html>

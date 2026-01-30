@@ -1,0 +1,21 @@
+<h2>Pending User Approvals</h2>
+
+<div class="approval-grid">
+  {% for user in pending_users %}
+    <form method="post" class="list">
+      {% csrf_token %}
+
+      <div class="username">{{ user.username }}</div>
+      <input type="hidden" name="approve_user" value="{{ user.id }}">
+
+      <div class="input-group1 inline-group1">
+        <input type="text" name="account_number" id="acc_{{ user.id }}" placeholder=" " required>
+        <label for="acc_{{ user.id }}">Account Number</label>
+      </div>
+
+      <button type="submit" class="btn1">Approve</button>
+    </form>
+  {% empty %}
+    <p>No pending users.</p>
+  {% endfor %}
+</div>

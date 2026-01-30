@@ -1,0 +1,16 @@
+<h2>Deposit Money</h2>
+<form method="post" class="div1">
+  {% csrf_token %}
+  
+  <div class="input-group">
+    <input type="text" name="account_number" id="account_number" placeholder=" " required>
+    <label for="account_number">Account Number</label>
+  </div>
+
+  <div class="input-group">
+    <input type="number" name="amount" id="amount" placeholder=" " required>
+    <label for="amount">Amount</label>
+  </div>
+
+  <button type="submit" class="btn">Deposit</button>
+</form>

@@ -1,0 +1,233 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>FD & RD Calculator</title>
+    <style>
+       body {
+    font-family: Arial, sans-serif;
+    background: linear-gradient(135deg, #1f1c2c, #928dab);
+    min-height: 100vh;
+    margin: 0;
+    padding: 0;
+}
+
+/* Coming Soon Box */
+.coming-soon {
+    height: 200px;
+    border-radius: 20px;
+    background: rgba(255, 255, 255, .05);
+    backdrop-filter: blur(12px);
+    font-size: 40px;
+    color: white;
+    align-items: center;
+    justify-content: center;
+    display: flex;
+    font-weight: bold;
+    text-align: center;
+    padding: 10px;
+}
+
+/* Main Container */
+.container {
+    margin: 20px auto;
+    max-width: 600px;
+    width: 90%;
+    background: rgba(255, 255, 255, .05);
+    backdrop-filter: blur(12px);
+    border-radius: 10px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+label {
+    display: block;
+    margin-top: 10px;
+    font-size: 14px;
+    color: #fff;
+}
+
+select,
+input {
+    width: 100%;
+    padding: 10px;
+    margin-top: 5px;
+    border-radius: 6px;
+    border: 1px solid #ccc;
+    font-size: 15px;
+}
+
+button {
+    margin-top: 15px;
+    padding: 12px;
+    width: 100%;
+    max-width: 300px;
+    background: #4CAF50;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 16px;
+}
+
+button:hover {
+    background: #45a049;
+}
+
+/* Result Box */
+.result {
+    margin-top: 20px;
+    padding: 15px;
+    background: #f0f8ff;
+    border-radius: 6px;
+    width: 100%;
+    overflow-x: auto;
+}
+
+/* Table Styles */
+.calc-table {
+    width: 100%;
+    margin-top: 20px;
+    border-collapse: collapse;
+    font-family: Arial, sans-serif;
+    font-size: 16px;
+    text-align: center;
+    background: rgba(255, 255, 255, 0.08);
+    backdrop-filter: blur(10px);
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+}
+
+.calc-table th {
+    background: #1f1c2c;
+    color: #fff;
+    padding: 12px;
+    font-size: 15px;
+    letter-spacing: 0.5px;
+}
+
+.calc-table td {
+    padding: 10px;
+    color: #fff;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    font-size: 14px;
+}
+
+.calc-table tr:nth-child(even) td {
+    background: rgba(255, 255, 255, 0.05);
+}
+
+.calc-table tr:hover td {
+    background: rgba(255, 255, 255, 0.12);
+    transition: background 0.3s ease;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .coming-soon {
+        font-size: 30px;
+        height: auto;
+        padding: 20px;
+    }
+
+    .container {
+        width: 95%;
+        padding: 15px;
+    }
+
+    button {
+        width: 100%;
+    }
+
+    .calc-table th, .calc-table td {
+        font-size: 13px;
+        padding: 8px;
+    }
+}
+
+@media (max-width: 480px) {
+    .coming-soon {
+        font-size: 24px;
+        padding: 15px;
+    }
+
+    label {
+        font-size: 13px;
+    }
+
+    select, input {
+        font-size: 14px;
+        padding: 8px;
+    }
+
+    .calc-table {
+        font-size: 12px;
+    }
+
+    .calc-table th, .calc-table td {
+        padding: 6px;
+    }
+}
+
+
+    </style>
+</head>
+
+<body>
+    <div class="coming-soon">FD / RD Registration Coming Soon</div>
+
+    <div class="container">
+        <h2>FD / RD Calculator</h2>
+        <form method="post">
+            {% csrf_token %}
+            <label>Select Bank</label>
+            <select name="bank" required>
+                <option value="">-- Select Bank --</option>
+                <option value="SBI">SBI</option>
+                <option value="HDFC">HDFC</option>
+                <option value="ICICI">ICICI</option>
+                <option value="Axis">Axis</option>
+            </select>
+
+            <label>Select Type</label>
+            <select name="type" required>
+                <option value="FD">Fixed Deposit (FD)</option>
+                <option value="RD">Recurring Deposit (RD)</option>
+            </select>
+
+            <label>Enter Amount (₹)</label>
+            <input type="number" name="amount" min="1000" required>
+
+            <button type="submit">Calculate</button>
+        </form>
+
+        {% if result %}
+        <table class="calc-table">
+            <tr>
+                <th>Years</th>
+                <th>Principal Amount</th>
+                <th>Maturity Amount</th>
+                <th>Interest Earned</th>
+            </tr>
+            {% for years, data in result.items %}
+            <tr>
+                <td>{{ years }}</td>
+                <td>₹{{ data.principal }}</td>
+                <td>₹{{ data.maturity }}</td>
+                <td>₹{{ data.interest }}</td>
+            </tr>
+            {% endfor %}
+        </table>
+        {% endif %}
+    </div>
+</body>
+
+</html>

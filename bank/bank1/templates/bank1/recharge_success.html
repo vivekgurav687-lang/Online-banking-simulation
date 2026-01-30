@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Recharge Success</title>
+    <style>
+        body {
+            font-family: system-ui, sans-serif;
+            background: #f6f7fb;
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        .card {
+            background: #fff;
+            border-radius: 16px;
+            padding: 24px 28px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, .08);
+            width: 420px;
+        }
+
+        .ok {
+            font-size: 18px;
+            color: #10b981;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+
+        .row {
+            margin: 8px 0;
+        }
+
+        .row span {
+            display: block;
+            color: #64748b;
+            font-size: 14px;
+        }
+
+        .row strong {
+            font-size: 16px;
+            color: #0f172a;
+        }
+
+        .actions {
+            margin-top: 16px;
+            display: flex;
+            gap: 10px;
+        }
+
+        a.btn {
+            display: inline-block;
+            padding: 10px 14px;
+            border-radius: 10px;
+            text-decoration: none;
+            background: #111827;
+            color: #fff;
+        }
+
+        a.secondary {
+            background: #e5e7eb;
+            color: #111827;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="card">
+        <div class="ok">Recharge Successful ✅</div>
+        <div class="row"><span>Transaction ID</span><strong>#{{ tx.id }}</strong></div>
+        <div class="row"><span>Amount</span><strong>₹{{ tx.amount }}</strong></div>
+        <div class="row"><span>Number</span><strong>{{ tx.subscriber }}</strong></div>
+        <div class="row"><span>Operator</span><strong>{{ tx.operator }}</strong></div>
+        {% if tx.category %}
+        <div class="row"><span>Category</span><strong>{{ tx.category }}</strong></div>
+        {% endif %}
+        <div class="row"><span>When</span><strong>{{ tx.timestamp }}</strong></div>
+
+        <div class="actions">
+            <a href="{% url 'recharge_demo' %}" class="btn">Make another recharge</a>
+            <a href="{% url 'home' %}" class="btn secondary">Home</a>
+        </div>
+    </div>
+</body>
+
+</html>

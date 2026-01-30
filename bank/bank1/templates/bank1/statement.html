@@ -1,0 +1,313 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <title>Account Statement</title>
+  <link href="https://fonts.googleapis.com/css2?family=Rubik&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-light: #f4f4f4;
+      --text-light: #333;
+      --bg-dark: linear-gradient(135deg, #1f1c2c, #928dab);
+      --text-dark: #fff;
+      --card-bg-light: rgba(247, 244, 244, 0.6);
+      --card-bg-dark: rgba(0, 0, 0, 0.3);
+    }
+
+    body {
+      font-family: 'Rubik', sans-serif;
+      padding: 20px;
+      background: var(--bg-dark);
+      color: var(--text-dark);
+      transition: all 0.3s ease;
+    }
+
+    body.light-mode {
+      background: var(--bg-light);
+      color: var(--text-light);
+    }
+
+    h1 {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+
+    .theme-toggle {
+      position: fixed;
+      top: 15px;
+      right: 20px;
+      font-size: 24px;
+      cursor: pointer;
+      z-index: 100;
+    }
+
+    form {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 15px;
+      margin-bottom: 25px;
+    }
+
+    input,
+    select,
+    button {
+      padding: 10px;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+      font-size: 1em;
+      min-width: 120px;
+      flex: 1 1 180px;
+    }
+
+    .filter-btn {
+      background: #4CAF50;
+      color: white;
+      border: none;
+      cursor: pointer;
+      flex: 1 1 auto;
+    }
+
+    .transaction {
+      backdrop-filter: blur(8px);
+      background-color: var(--card-bg-dark);
+      padding: 15px;
+      margin-bottom: 10px;
+      border-left: 5px solid #4CAF50;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      transition: background-color 0.3s ease;
+      border-radius: 8px;
+    }
+
+    body.light-mode .transaction {
+      background-color: var(--card-bg-light);
+    }
+
+    .credit {
+      border-left-color: green;
+    }
+
+    .debit {
+      border-left-color: red;
+    }
+
+    .deposit {
+      border-left-color: #2196F3;
+    }
+
+    .transaction-header {
+      font-weight: bold;
+      display: flex;
+      justify-content: space-between;
+      flex-wrap: wrap;
+    }
+
+    .balance-info {
+      text-align: right;
+      font-size: 0.9em;
+      color: inherit;
+      margin-top: 4px;
+    }
+
+    .pagination {
+      text-align: center;
+      margin-top: 20px;
+    }
+
+    .pagination a,
+    .pagination span {
+      display: inline-block;
+      padding: 10px 15px;
+      margin: 0 5px;
+      background: #ddd;
+      border-radius: 5px;
+      text-decoration: none;
+      color: #000;
+    }
+
+    .pagination .current {
+      background: #4CAF50;
+      color: white;
+      font-weight: bold;
+    }
+
+    .filter-methods {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      margin-bottom: 10px;
+    }
+
+    .filter-methods button {
+      padding: 8px 12px;
+      margin: 5px;
+      background: #ccc;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+
+    .filter-methods .active {
+      background: #4CAF50;
+      color: white;
+    }
+
+    .balances {
+      margin: 20px 0;
+      padding: 10px;
+      background: var(--balances-bg-dark);
+      border-radius: 8px;
+      text-align: center;
+      font-size: 1em;
+    }
+
+    body.light-mode .balances {
+      background: var(--balances-bg-light);
+    }
+
+    @media (max-width: 768px) {
+      form {
+        flex-direction: column;
+        align-items: center;
+      }
+
+      .transaction-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 5px;
+      }
+
+      .balance-info {
+        text-align: left;
+        font-size: 0.85em;
+      }
+
+      input,
+      select,
+      button {
+        width: 90%;
+        max-width: 300px;
+      }
+
+      .theme-toggle {
+        top: 10px;
+        right: 10px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <a href="{% url 'home' %}"><button type="submit">Home</button></a>
+  <div class="theme-toggle" onclick="toggleTheme()" title="Toggle Theme">🌙</div>
+
+  <h1>Account Statement</h1>
+
+  <form method="get">
+    <input type="date" name="from" value="{{ from_date }}" />
+    <input type="date" name="to" value="{{ to_date }}" />
+
+    <select name="method">
+      <option value="">All</option>
+      <option value="UPI" {% if method == "UPI" %}selected{% endif %}>UPI</option>
+      <option value="IMPS" {% if method == "IMPS" %}selected{% endif %}>IMPS</option>
+      <option value="NEFT" {% if method == "NEFT" %}selected{% endif %}>NEFT</option>
+      <option value="Deposit" {% if method == "Deposit" %}selected{% endif %}>Deposit</option>
+    </select>
+
+    <button type="submit" class="filter-btn">Apply Filter</button>
+    <a href="{% url 'statement' %}" style="text-decoration:none;">
+      <button type="button" class="filter-btn" style="background:#f44336;">Reset</button>
+    </a>
+  </form>
+
+  {% if transactions %}
+  {% for txn in transactions.object_list %}
+  <div class="transaction 
+                {% if txn.sender == request.user %}
+                    debit
+                {% elif txn.sender == None and txn.receiver == request.user %}
+                    deposit
+                {% else %}
+                    credit
+                {% endif %}
+            ">
+    <div class="transaction-header">
+      <div>
+        {% if txn.sender == request.user %}
+        Debited to {{ txn.receiver.username }}
+        {% elif txn.sender == None and txn.receiver == request.user %}
+        Deposited by Bank
+        {% else %}
+        Credited by {{ txn.sender.username }}
+        {% endif %}
+      </div>
+      <div>₹{{ txn.amount }}</div>
+    </div>
+    <div class="balance-info">
+      Method: {{ txn.method }} |
+      Time: {{ txn.timestamp|date:"d M Y, h:i A" }}
+    </div>
+    <div class="balance-info">
+      Balance After Txn: ₹{{ txn.running_balance }}
+    </div>
+  </div>
+  {% endfor %}
+  {% else %}
+  <p style="text-align:center;">No transactions found for the selected filters.</p>
+  {% endif %}
+
+  <div class="pagination">
+    {% if transactions.has_previous %}
+    <a
+      href="?{% if from_date %}from={{ from_date }}&{% endif %}{% if to_date %}to={{ to_date }}&{% endif %}{% if method %}method={{ method }}&{% endif %}page={{ transactions.previous_page_number }}">Previous</a>
+    {% endif %}
+
+    <span class="current">Page {{ transactions.number }} of {{ transactions.paginator.num_pages }}</span>
+
+    {% if transactions.has_next %}
+    <a
+      href="?{% if from_date %}from={{ from_date }}&{% endif %}{% if to_date %}to={{ to_date }}&{% endif %}{% if method %}method={{ method }}&{% endif %}page={{ transactions.next_page_number }}">Next</a>
+    {% endif %}
+  </div>
+
+  <div class="balances">
+    <p><strong>Opening Balance:</strong> ₹{{ opening_balance }}</p>
+    <p><strong>Closing Balance:</strong> ₹{{ closing_balance }}</p>
+  </div>
+
+  <script>
+    // Check for saved theme preference on page load
+    document.addEventListener('DOMContentLoaded', () => {
+      const savedTheme = localStorage.getItem('theme');
+      const body = document.body;
+      const icon = document.querySelector('.theme-toggle');
+
+      if (savedTheme === 'light-mode') {
+        body.classList.add('light-mode');
+        icon.textContent = '☀️';
+      } else {
+        body.classList.remove('light-mode');
+        icon.textContent = '🌙';
+      }
+    });
+
+    function toggleTheme() {
+      const body = document.body;
+      const icon = document.querySelector('.theme-toggle');
+      body.classList.toggle('light-mode');
+
+      if (body.classList.contains('light-mode')) {
+        icon.textContent = '☀️';
+        localStorage.setItem('theme', 'light-mode'); // Save preference
+      } else {
+        icon.textContent = '🌙';
+        localStorage.setItem('theme', 'dark-mode'); // Save preference
+      }
+    }
+  </script>
+</body>
+
+</html>

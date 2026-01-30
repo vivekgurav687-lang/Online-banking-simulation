@@ -1,0 +1,392 @@
+{% load static %}
+<!doctype html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <title>FASTag Recharge</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <style>
+        :root {
+            --primary: #334155;
+        }
+
+        body {
+            margin: 0;
+            font-family: system-ui, Segoe UI, Roboto, Arial;
+            background: linear-gradient(135deg, #1f1c2c, #928dab);
+            color: #fff
+        }
+
+        .wrap {
+            display: flex;
+            justify-content: center;
+            padding: 16px
+        }
+
+        .border {
+            width: 80%;
+            border-radius: 20px;
+            background: rgba(255, 255, 255, .05);
+            backdrop-filter: blur(12px);
+            padding: 20px;
+            min-height: 90vh;
+            max-height: 90vh;
+            overflow-y: auto;
+            overflow-x: hidden;
+        }
+
+        .border::-webkit-scrollbar {
+            width: 8px;  /* scrollbar width */
+        }
+
+        .border::-webkit-scrollbar-track {
+            /* background: #f1f1f1;  */
+            border-radius: 10px;
+        }
+
+        .border::-webkit-scrollbar-thumb {
+            background: #888;
+            border-radius: 10px;
+        }
+
+        .border::-webkit-scrollbar-thumb:hover {
+            background: #555;  /* darker on hover */
+}
+
+        .grid2 {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+
+        .card {
+            flex: 0 0 calc(30% - 12px);
+            background: #fff;
+            color: #0f172a;
+            border: 1px solid #cbd5e1;
+            border-radius: 12px;
+            padding: 12px;
+            text-align: left;
+            display: flex;
+            align-items: center;
+            cursor: pointer
+        }
+         
+        label {
+            display: block;
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 16px;
+            color: #fcfbfb;
+        }
+
+        input[name="vehicle_no"] {
+            width: 100%;
+            padding: 10px 12px;
+            font-size: 16px;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            outline: none;
+            transition: all 0.3s ease;
+            background: #fff;
+        }
+
+        /* On focus */
+        input[name="vehicle_no"]:focus {
+            border-color: #4a90e2;
+            box-shadow: 0 0 5px rgba(74, 144, 226, 0.5);
+        }
+
+        /* Placeholder styling */
+        input[name="vehicle_no"]::placeholder {
+            color: #999;
+            font-size: 14px;
+}
+
+
+        .card.sel {
+            background: var(--primary);
+            color: #fff
+        }
+
+        input.choice {
+            display: none
+        }
+
+        button {
+            cursor: pointer;
+            border: 0;
+            border-radius: 10px;
+            padding: .7rem 1rem;
+            font-weight: 600
+        }
+
+        .btn {
+            background: var(--primary);
+            color: #fff
+        }
+
+        .btn:disabled {
+            background: #64748b;
+            cursor: not-allowed
+        }
+
+        .step {
+            display: none;
+            animation: fade .3s ease
+        }
+
+        @keyframes fade {
+            from {
+                opacity: 0;
+                transform: translateY(10px)
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0)
+            }
+        }
+
+        /* Overlay PIN */
+        .overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            display: none;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .overlay-content {
+            background: #fff;
+            color: #0f172a;
+            padding: 20px;
+            border-radius: 12px;
+            width: 300px;
+            text-align: center;
+        }
+
+        .pin-input {
+            width: 45px;
+            height: 45px;
+            font-size: 22px;
+            text-align: center;
+            margin: 5px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+        }
+
+        @media (max-width: 1024px) {
+    .border {
+        width: 90%; /* occupy more space */
+    }
+    .card {
+        flex: 0 0 calc(45% - 12px); /* 2 cards per row */
+    }
+}
+
+/* Mobile (≤600px) */
+@media (max-width: 600px) {
+    .wrap {
+        padding: 8px;
+    }
+    .border {
+        width: 100%; 
+        min-height: auto;
+        max-height: none; 
+        border-radius: 12px;
+    }
+    .grid2 {
+        gap: 8px;
+    }
+    .card {
+        flex: 0 0 100%; /* 1 card per row */
+        padding: 10px;
+    }
+    .pin-input {
+        width: 38px;
+        height: 38px;
+        font-size: 18px;
+    }
+    button {
+        margin-top: 4px;
+        width: 100%; /* full width buttons */
+    }
+}
+    </style>
+</head>
+
+<body>
+    <div class="wrap">
+        <div class="border">
+            <form method="post" action="{% url 'fastag_verify' %}" id="fastagForm">
+                {% csrf_token %}
+
+                <input type="hidden" name="plan_value" id="plan_value">
+                <input type="hidden" name="pin" id="fastag_pin">
+
+                <!-- STEP 1 -->
+                <div id="step1" class="step" style="display:block">
+                    <h2>Select Bank</h2>
+                    <div class="grid2">
+                        {% for bank in banks %}
+                        <label class="card">
+                            <input class="choice" type="radio" name="bank" value="{{ bank.name }}">
+                            <img src="{% static bank.logo %}" alt="{{ bank.name }}"
+                                style="height:30px;margin-right:8px;">
+                            <span>{{ bank.name }}</span>
+                        </label>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <!-- STEP 2 + STEP 3 -->
+                <div id="step2" class="step">
+                    <h2>Vehicle Details</h2>
+                    <label>Vehicle Number</label>
+                    <input name="vehicle_no" maxlength="15" required placeholder="MH12AB1234">
+
+                    <label style="margin-top:12px">Select Vehicle Type</label>
+                    <div class="grid2" id="vehicleTypeGrid">
+                        {% for v in vehicle_types %}
+                        <label class="card">
+                            <input class="choice" type="radio" name="vehicle_type" value="{{ v.name }}">
+                            <img src="{% static v.image %}" alt="{{ v.name }}" style="height:40px;margin-right:8px;">
+                            <span>{{ v.name }}</span>
+                        </label>
+                        {% endfor %}
+                    </div>
+
+                    <div style="margin-top:10px">
+                        <button type="button" class="btn" id="fetchBtn">Fetch & Show Plans</button>
+                    </div>
+
+                    <!-- STEP 3 (inline) -->
+                    <div id="plansBlock" class="step" style="margin-top:20px">
+                        <h2>Step 3: Choose a Plan</h2>
+                        <div class="grid2" id="planGrid"></div>
+                        <div style="margin-top:12px">
+                            <button type="button" class="btn" id="proceedBtn" disabled>Proceed</button>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- PIN Overlay -->
+    <div id="pinOverlay" class="overlay">
+        <div class="overlay-content">
+            <h3>Enter 4-Digit PIN</h3>
+            <div>
+                <input maxlength="1" class="pin-input" id="d1">
+                <input maxlength="1" class="pin-input" id="d2">
+                <input maxlength="1" class="pin-input" id="d3">
+                <input maxlength="1" class="pin-input" id="d4">
+            </div>
+            <div style="margin-top:15px">
+                <button class="btn" type="button" onclick="submitPin()">Verify & Pay</button>
+                <button class="btn" style="background:red" type="button" onclick="closePinOverlay()">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <script id="plansData" type="application/json">{{ plans_by_type|safe }}</script>
+    <script>
+        const step1 = document.getElementById('step1');
+        const step2 = document.getElementById('step2');
+        const bankCards = step1.querySelectorAll('.card');
+        const vehCards = document.querySelectorAll('#vehicleTypeGrid .card');
+        const fetchBtn = document.getElementById('fetchBtn');
+        const plansBlock = document.getElementById('plansBlock');
+        const planGrid = document.getElementById('planGrid');
+        const proceedBtn = document.getElementById('proceedBtn');
+        const planValueInput = document.getElementById('plan_value');
+        const pinOverlay = document.getElementById('pinOverlay');
+        const pinHiddenInput = document.getElementById('fastag_pin');
+
+        // Selectable cards
+        function bindSelectable(cards, nextStep) {
+            cards.forEach(card => {
+                card.addEventListener('click', () => {
+                    const input = card.querySelector('input');
+                    input.checked = true;
+                    cards.forEach(c => c.classList.remove('sel'));
+                    card.classList.add('sel');
+                    if (nextStep) {
+                        step1.style.display = 'none';
+                        step2.style.display = 'block';
+                    }
+                });
+            });
+        }
+        bindSelectable(bankCards, true);
+        bindSelectable(vehCards, false);
+
+        // Render plans
+        function renderPlans(type) {
+            const catalog = JSON.parse(document.getElementById('plansData').textContent || '{}');
+            const plans = catalog[type] || [];
+            planGrid.innerHTML = '';
+            plans.forEach(p => {
+                const value = `${p.name}|${p.amount}|${p.validity}|${p.desc}`;
+                const card = document.createElement('label');
+                card.className = 'card';
+                card.innerHTML = `<input class="choice" type="radio" name="plan_pick" value="${value}">
+          <div><strong>${p.name}</strong><br>₹${p.amount} • ${p.validity}<br><small>${p.desc}</small></div>`;
+                card.addEventListener('click', () => {
+                    [...planGrid.querySelectorAll('.card')].forEach(c => c.classList.remove('sel'));
+                    card.classList.add('sel');
+                    card.querySelector('input').checked = true;
+                    planValueInput.value = value;
+                    proceedBtn.disabled = false;
+                });
+                planGrid.appendChild(card);
+            });
+        }
+
+        // Fetch plans
+        fetchBtn.addEventListener('click', () => {
+            const vehType = document.querySelector('input[name="vehicle_type"]:checked');
+            const vehNo = document.querySelector('input[name="vehicle_no"]').value.trim();
+            if (!vehNo) { alert('Enter vehicle number'); return; }
+            if (!vehType) { alert('Select vehicle type'); return; }
+            renderPlans(vehType.value);
+            plansBlock.style.display = 'block';
+            proceedBtn.disabled = true;
+            planValueInput.value = '';
+        });
+
+        // Proceed -> PIN
+        proceedBtn.addEventListener('click', () => {
+            pinOverlay.style.display = 'flex';
+            document.getElementById('d1').focus();
+        });
+
+        function closePinOverlay() { pinOverlay.style.display = 'none'; }
+
+        function submitPin() {
+            let pin = document.getElementById("d1").value +
+                document.getElementById("d2").value +
+                document.getElementById("d3").value +
+                document.getElementById("d4").value;
+            if (pin.length !== 4) { alert("Enter 4-digit PIN"); return; }
+            pinHiddenInput.value = pin;
+            document.getElementById('fastagForm').submit();
+        }
+
+        // Auto move cursor
+        document.querySelectorAll(".pin-input").forEach((input, idx, arr) => {
+            input.addEventListener("input", () => {
+                if (input.value && idx < arr.length - 1) arr[idx + 1].focus();
+            });
+        });
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,415 @@
+{% load static %}
+<!doctype html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <title>Metro NCMC Top-up</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <style>
+        :root {
+            --primary: #334155;
+        }
+
+        body {
+            margin: 0;
+            font-family: system-ui, Segoe UI, Roboto, Arial;
+            background: linear-gradient(135deg, #1f1c2c, #928dab);
+            color: #fff;
+            height: 100vh;
+        }
+
+        /* Layout */
+        .wrap {
+            margin-top: 70px;
+            display: flex;
+            justify-content: center;
+            padding: 16px;
+        }
+
+        .border {
+            width: 80%;
+            border-radius: 20px;
+            background: rgba(255, 255, 255, .05);
+            backdrop-filter: blur(12px);
+            padding: 20px;
+            min-height: 90vh;
+            max-height: 90vh;
+            overflow-y: auto;
+            overflow-x: hidden;
+        }
+
+        /* Custom Scrollbar */
+        .border::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .border::-webkit-scrollbar-thumb {
+            background: #888;
+            border-radius: 10px;
+        }
+
+        .border::-webkit-scrollbar-thumb:hover {
+            background: #555;
+        }
+
+        /* Metro Panel */
+        .panel {
+            background: rgba(255, 255, 255, 0.08);
+            backdrop-filter: blur(10px);
+            padding: 20px;
+            border-radius: 16px;
+            width: 100%;
+            max-width: 550px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        .panel h2 {
+            margin-top: 0;
+            font-size: 22px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .badge {
+            font-size: 12px;
+            background: #fff;
+            color: #000;
+            padding: 2px 8px;
+            border-radius: 6px;
+        }
+
+        /* Biller cards */
+        .biller-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 14px;
+            margin: 10px 0 20px;
+        }
+
+        .biller-card {
+            flex: 0 0 calc(50% - 20px);
+            background: #fff;
+            color: #0f172a;
+            border: 1px solid #cbd5e1;
+            border-radius: 12px;
+            /* padding: 12px; */
+            text-align: left;
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+            height: 60px;
+
+        }
+
+        .biller-card input {
+            display: none;
+        }
+
+        .biller-card img {
+            width: 50px;
+            height: 50px;
+            object-fit: contain;
+            margin-bottom: 6px;
+            margin-left: 10px;
+        }
+
+        .biller-card span {
+            font-size: 14px;
+            margin-left: 15px;
+            color: black;
+            display: block;
+        }
+
+        .biller-card:hover {
+            border-color: #4a90e2;
+        }
+
+        .biller-card input:checked+img {
+            border: 2px solid #4a90e2;
+            border-radius: 8px;
+        }
+
+        /* Forms */
+        label {
+            display: block;
+            font-size: 14px;
+            font-weight: 600;
+            margin: 14px 0 6px;
+            color: #fcfbfb;
+        }
+
+        input,
+        select {
+            width: 90%;
+            padding: 10px 12px;
+            font-size: 16px;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            outline: none;
+            transition: all 0.3s ease;
+            background: #fff;
+        }
+
+        input:focus {
+            border-color: #4a90e2;
+            box-shadow: 0 0 5px rgba(74, 144, 226, 0.5);
+        }
+
+        input::placeholder {
+            color: #999;
+            font-size: 14px;
+        }
+
+        .row {
+            display: flex;
+            gap: 12px;
+        }
+
+        .row>div {
+            flex: 1;
+        }
+
+        /* Buttons */
+        button {
+            cursor: pointer;
+            border: 0;
+            border-radius: 10px;
+            padding: .7rem 1rem;
+            font-weight: 600;
+        }
+
+        .btn {
+            background: var(--primary);
+            color: #fff;
+        }
+
+        .btn:disabled {
+            background: #64748b;
+            cursor: not-allowed;
+        }
+
+        /* Steps */
+        .step {
+            display: none;
+            animation: fade .3s ease;
+        }
+
+        @keyframes fade {
+            from {
+                opacity: 0;
+                transform: translateY(10px)
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0)
+            }
+        }
+
+        /* Overlay PIN */
+        .overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 999;
+        }
+
+        .box {
+            background: #fff;
+            color: #0f172a;
+            padding: 20px;
+            border-radius: 12px;
+            width: 300px;
+            text-align: center;
+        }
+
+        .pin-row {
+            display: flex;
+            justify-content: center;
+            margin: 12px 0;
+        }
+
+        .pin {
+            width: 45px;
+            height: 45px;
+            font-size: 22px;
+            text-align: center;
+            margin: 5px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+        }
+
+        /* Responsive */
+        @media (max-width: 600px) {
+            .wrap {
+                padding: 8px;
+                margin-top: 0;
+            }
+
+            .border {
+                width: 100%;
+                border-radius: 12px;
+                max-height: none;
+            }
+
+            .row {
+                flex-direction: column;
+            }
+
+            .biller-container{
+                gap: 0;
+            }
+
+            .biller-card {
+                flex: 0 0 100%;
+            }
+
+            .pin {
+                width: 38px;
+                height: 38px;
+                font-size: 18px;
+            }
+
+            button {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    {% if messages %}
+    <div class="msg">
+        {% for m in messages %}
+        <div style="background:#fff;color:#111;padding:10px;border-radius:10px;margin-bottom:8px">{{ m }}</div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    <div class="wrap">
+        <!-- Metro panel -->
+        <div class="panel">
+            <h2>Metro NCMC Top-up <span class="badge">Demo</span></h2>
+            <form method="post" id="metroForm">
+                {% csrf_token %}
+                <input type="hidden" name="action" value="metro_start">
+                <input type="hidden" name="pin" id="metro_pin">
+
+                <label>Biller</label>
+                <div class="biller-container">
+                    {% for b in billers %}
+                    <label class="biller-card">
+                        <input type="radio" name="biller" value="{{ b.name }}" required>
+                        <img src="{% static b.image %}" alt="{{ b.name }}">
+                        <span>{{ b.name }}</span>
+                    </label>
+                    {% endfor %}
+                </div>
+
+                <div class="row">
+                    <div>
+                        <label>Mobile Number</label>
+                        <input name="mobile" maxlength="10" pattern="\d{10}" required>
+                    </div>
+                    <div>
+                        <label>Last 4 digits of NCMC</label>
+                        <input name="last4" maxlength="4" pattern="\d{4}" required>
+                    </div>
+                </div>
+
+                <label>Nickname (optional)</label>
+                <input name="nickname" maxlength="30" placeholder="e.g., Office Card">
+
+                <label>Amount (max ₹2000, no minimum)</label>
+                <input name="amount" type="number" step="1" min="1" max="2000" required>
+
+                <div style="margin-top:10px">
+                    <button type="button" class="btn" id="metroProceed">Continue</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Metro PIN Overlay -->
+    <div class="overlay" id="metroPinOverlay">
+        <div class="box">
+            <h3 style="margin:0 0 6px">Enter 4-digit PIN</h3>
+            <div class="pin-row">
+                <input class="pin" maxlength="1" inputmode="numeric">
+                <input class="pin" maxlength="1" inputmode="numeric">
+                <input class="pin" maxlength="1" inputmode="numeric">
+                <input class="pin" maxlength="1" inputmode="numeric">
+            </div>
+            <div style="display:flex;gap:8px;justify-content:flex-end">
+                <button type="button" id="metroPinCancel">Cancel</button>
+                <button type="button" class="btn" id="metroPinSubmit">Submit</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const metroProceed = document.getElementById('metroProceed');
+        const metroOverlay = document.getElementById('metroPinOverlay');
+        const metroPins = metroOverlay.querySelectorAll('.pin');
+        const metroPinCancel = document.getElementById('metroPinCancel');
+        const metroPinSubmit = document.getElementById('metroPinSubmit');
+        const metroPinField = document.getElementById('metro_pin');
+        const metroForm = document.getElementById('metroForm');
+
+        // Show overlay
+        metroProceed.addEventListener('click', () => {
+            if (!metroForm.checkValidity()) {
+                metroForm.reportValidity();  // shows browser's built-in validation errors
+                return; // stop here, don't open overlay
+            }
+
+            // If valid → show overlay
+            metroOverlay.style.display = 'flex';
+            metroPins.forEach(i => i.value = "");
+            metroPins[0].focus();
+        });
+
+        // Cancel
+        metroPinCancel.addEventListener('click', () => {
+            metroOverlay.style.display = 'none';
+        });
+
+        // Auto move
+        metroPins.forEach((input, idx) => {
+            input.addEventListener('input', () => {
+                if (input.value.length === 1 && idx < metroPins.length - 1) {
+                    metroPins[idx + 1].focus();
+                }
+            });
+            input.addEventListener('keydown', e => {
+                if (e.key === 'Backspace' && input.value === '' && idx > 0) {
+                    metroPins[idx - 1].focus();
+                }
+            });
+        });
+
+        // Submit
+        metroPinSubmit.addEventListener('click', () => {
+            const pin = Array.from(metroPins).map(i => i.value).join('');
+            if (!/^\d{4}$/.test(pin)) {
+                alert('Enter a valid 4-digit PIN');
+                return;
+            }
+            metroPinField.value = pin;
+            metroOverlay.style.display = 'none';
+            metroForm.submit();
+        });
+    </script>
+
+</body>
+
+</html>

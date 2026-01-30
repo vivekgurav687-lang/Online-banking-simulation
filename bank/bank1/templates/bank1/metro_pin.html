@@ -1,0 +1,115 @@
+{% load static %}
+<!doctype html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <title>Metro PIN</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <style>
+        body {
+            margin: 0;
+            font-family: system-ui, Segoe UI, Roboto, Arial;
+            background: linear-gradient(135deg, #1f1c2c, #928dab);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center
+        }
+
+        .card {
+            background: #fff;
+            border-radius: 14px;
+            max-width: 360px;
+            width: 92%;
+            padding: 18px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, .25);
+            color: #111
+        }
+
+        .row {
+            display: flex;
+            gap: 8px;
+            justify-content: center;
+            margin: 12px 0
+        }
+
+        .row input {
+            width: 56px;
+            height: 56px;
+            text-align: center;
+            font-size: 24px
+        }
+
+        button {
+            border: 0;
+            border-radius: 10px;
+            padding: .6rem 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            background: #334155;
+            color: #fff
+        }
+
+        .muted {
+            color: #334155
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="card">
+        <h3 style="margin:0 0 6px">Enter PIN to confirm</h3>
+        <p class="muted" style="margin:0 0 8px">
+            Biller: <b>{{ payload.biller }}</b><br>
+            Mobile: <b>{{ payload.mobile }}</b><br>
+            Amount: <b>₹{{ payload.amount }}</b>
+        </p>
+
+        {% if messages %}
+        {% for m in messages %}
+        <div style="background:#fee2e2;color:#991b1b;border-radius:8px;padding:6px 8px;margin-bottom:8px">{{ m }}</div>
+        {% endfor %}
+        {% endif %}
+
+        <form method="post">
+            {% csrf_token %}
+            <input type="hidden" name="pin" id="pinField">
+            <div class="row">
+                <input maxlength="1" inputmode="numeric" class="p">
+                <input maxlength="1" inputmode="numeric" class="p">
+                <input maxlength="1" inputmode="numeric" class="p">
+                <input maxlength="1" inputmode="numeric" class="p">
+            </div>
+            <div style="display:flex;justify-content:flex-end;gap:8px">
+                <a href="{% url 'topup_home' %}"
+                    style="text-decoration:none;padding:.6rem 1rem;border-radius:10px;background:#e5e7eb;color:#111">Cancel</a>
+                <button type="submit" id="submitBtn">Confirm</button>
+            </div>
+        </form>
+    </div>
+
+    <script>
+        const boxes = document.querySelectorAll('.p');
+        const pinField = document.getElementById('pinField');
+        const submitBtn = document.getElementById('submitBtn');
+
+        boxes.forEach((b, i) => {
+            b.addEventListener('input', () => {
+                if (b.value && i < boxes.length - 1) boxes[i + 1].focus();
+            });
+            b.addEventListener('keydown', e => {
+                if (e.key === 'Backspace' && !b.value && i > 0) boxes[i - 1].focus();
+            });
+        });
+
+        submitBtn.addEventListener('click', (e) => {
+            const pin = Array.from(boxes).map(x => x.value).join('');
+            if (!/^\d{4}$/.test(pin)) { e.preventDefault(); alert('Enter a valid 4-digit PIN'); return; }
+            pinField.value = pin;
+        });
+    </script>
+</body>
+
+</html>
